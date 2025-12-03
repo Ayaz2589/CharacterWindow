@@ -1,0 +1,83 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Right-side stats panel: Item Level, Attributes, Enhancements -->
+  <Frame name="CharacterWindowStatsPanel" parent="CharacterWindowFrame">
+    <Size x="260" y="0"/>
+    <Anchors>
+      <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-20" y="-80"/>
+      <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="40"/>
+    </Anchors>
+
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentBG" setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.75"/>
+        </Texture>
+      </Layer>
+
+      <Layer level="ARTWORK">
+        <!-- Section titles -->
+        <FontString name="$parentItemLevelLabel" inherits="GameFontNormalLarge" text="Item Level">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="16" y="-16"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentAttributesLabel" inherits="GameFontNormal" text="Attributes">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentItemLevelLabel" relativePoint="BOTTOMLEFT" x="0" y="-32"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentEnhancementsLabel" inherits="GameFontNormal" text="Enhancements">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLabel" relativePoint="BOTTOMLEFT" x="0" y="-64"/>
+          </Anchors>
+        </FontString>
+
+        <!-- Item level value -->
+        <FontString name="$parentItemLevelValue" inherits="GameFontHighlightLarge">
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentItemLevelLabel" relativePoint="RIGHT" x="16" y="0"/>
+          </Anchors>
+        </FontString>
+
+        <!-- Attribute lines (placeholders; values filled from Lua) -->
+        <FontString name="$parentAttributesLine1" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLabel" relativePoint="BOTTOMLEFT" x="0" y="-4"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentAttributesLine2" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentAttributesLine3" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine2" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+          </Anchors>
+        </FontString>
+
+        <!-- Enhancement lines (placeholders) -->
+        <FontString name="$parentEnhancementsLine1" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLabel" relativePoint="BOTTOMLEFT" x="0" y="-4"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentEnhancementsLine2" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentEnhancementsLine3" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine2" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+  </Frame>
+
+</Ui>
+
+

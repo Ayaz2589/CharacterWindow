@@ -1,7 +1,135 @@
 local addonName, ns = ...
 
--- Forward declaration so EQUIPMENT_SLOTS is visible inside functions
+-- Forward declarations so slot tables and stats panel are visible inside functions
 local EQUIPMENT_SLOTS
+local LEFT_SLOT_SUFFIXES
+local RIGHT_SLOT_SUFFIXES
+
+-- Map player race/class to character creation starting zone atlases
+local RACE_ATLAS_MAP = {
+    -- Core races
+    Orc                = "charactercreate-startingzone-orc",
+    Troll              = "charactercreate-startingzone-troll",
+    Tauren             = "charactercreate-startingzone-tauren",
+    Scourge            = "charactercreate-startingzone-undead",
+    Undead             = "charactercreate-startingzone-undead",
+    NightElf           = "charactercreate-startingzone-nightelf",
+    Draenei            = "charactercreate-startingzone-draenei",
+    Dwarf              = "charactercreate-startingzone-dwarf",
+    Gnome              = "charactercreate-startingzone-gnome",
+    Goblin             = "charactercreate-startingzone-goblin",
+    Worgen             = "charactercreate-startingzone-worgen",
+    BloodElf           = "charactercreate-startingzone-bloodelf",
+    Pandaren           = "charactercreate-startingzone-pandaren",
+
+    -- Allied / newer races
+    LightforgedDraenei = "charactercreate-startingzone-lightforgeddraenei",
+    MagharOrc          = "charactercreate-startingzone-magharorc",
+    Mechagnome         = "charactercreate-startingzone-mechagnome",
+    Nightborne         = "charactercreate-startingzone-nightborne",
+    HighmountainTauren = "charactercreate-startingzone-highmountaintauren",
+    VoidElf            = "charactercreate-startingzone-voidelf",
+    Vulpera            = "charactercreate-startingzone-vulpera",
+    ZandalariTroll     = "charactercreate-startingzone-zandalaritroll",
+    DarkIronDwarf      = "charactercreate-startingzone-darkirondwarf",
+    KulTiran           = "charactercreate-startingzone-kultiran",
+    Earthen            = "charactercreate-startingzone-earthen",
+}
+
+-- Choose a background atlas based on race/class
+local function CharacterWindow_UpdateBackground()
+    if not CharacterWindowFrameZoneBG then
+        return
+    end
+
+    local _, raceFile = UnitRace("player")
+    local _, classFile = UnitClass("player")
+
+    local atlas
+
+    -- Class-based overrides
+    if classFile == "DEMONHUNTER" then
+        atlas = "charactercreate-startingzone-demonhunter"
+    elseif classFile == "DEATHKNIGHT" and raceFile and not RACE_ATLAS_MAP[raceFile] then
+        -- Allied race death knights share a common background
+        atlas = "charactercreate-startingzone-deathknight-alliedraces"
+    end
+
+    -- Race-based fallback
+    if not atlas and raceFile and RACE_ATLAS_MAP[raceFile] then
+        atlas = RACE_ATLAS_MAP[raceFile]
+    end
+
+    -- Final fallback if we don't have a specific mapping
+    if not atlas then
+        atlas = "charactercreate-startingzone-orc"
+    end
+
+    if CharacterWindowFrameZoneBG.SetAtlas then
+        CharacterWindowFrameZoneBG:SetAtlas(atlas, true)
+    else
+        CharacterWindowFrameZoneBG:SetTexture("Interface\\Glues\\CharacterCreate\\" .. atlas)
+    end
+
+    -- Make the background black & white and slightly darker
+    if CharacterWindowFrameZoneBG.SetDesaturated then
+        CharacterWindowFrameZoneBG:SetDesaturated(true)
+    end
+    CharacterWindowFrameZoneBG:SetVertexColor(0.5, 0.5, 0.5)
+end
+
+-- Update the right-side stats panel (item level + basic stats)
+local function CharacterWindow_UpdateStatsPanel()
+    if not CharacterWindowStatsPanel then
+        return
+    end
+
+    -- Item level
+    local avg, equipped = GetAverageItemLevel()
+    local ilvl = equipped or avg
+    if CharacterWindowStatsPanelItemLevelValue and ilvl then
+        CharacterWindowStatsPanelItemLevelValue:SetFormattedText("%.1f", ilvl)
+    end
+
+    -- Primary stat, stamina, armor (very simple approximation)
+    local _, class = UnitClass("player")
+    local primaryLabel = "Intellect"
+    if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "DEMONHUNTER" then
+        primaryLabel = "Agility"
+    elseif class == "PALADIN" or class == "DEATHKNIGHT" then
+        primaryLabel = "Strength"
+    end
+
+    local statIndex = primaryLabel == "Strength" and 1 or (primaryLabel == "Agility" and 2 or 4)
+    local primaryBase, primaryEff = UnitStat("player", statIndex)
+    local staminaBase, staminaEff = UnitStat("player", 3)
+    local baseArmor, effectiveArmor = UnitArmor("player")
+
+    if CharacterWindowStatsPanelAttributesLine1 then
+        CharacterWindowStatsPanelAttributesLine1:SetFormattedText("%s: %d", primaryLabel, primaryEff or primaryBase or 0)
+    end
+    if CharacterWindowStatsPanelAttributesLine2 then
+        CharacterWindowStatsPanelAttributesLine2:SetFormattedText("Stamina: %d", staminaEff or staminaBase or 0)
+    end
+    if CharacterWindowStatsPanelAttributesLine3 then
+        CharacterWindowStatsPanelAttributesLine3:SetFormattedText("Armor: %d", effectiveArmor or baseArmor or 0)
+    end
+
+    -- Basic enhancements: Crit, Haste, Mastery
+    local crit    = GetCritChance and GetCritChance() or 0
+    local haste   = GetHaste and GetHaste() or 0
+    local mastery = GetMasteryEffect and GetMasteryEffect() or 0
+
+    if CharacterWindowStatsPanelEnhancementsLine1 then
+        CharacterWindowStatsPanelEnhancementsLine1:SetFormattedText("Crit: %.1f%%", crit)
+    end
+    if CharacterWindowStatsPanelEnhancementsLine2 then
+        CharacterWindowStatsPanelEnhancementsLine2:SetFormattedText("Haste: %.1f%%", haste)
+    end
+    if CharacterWindowStatsPanelEnhancementsLine3 then
+        CharacterWindowStatsPanelEnhancementsLine3:SetFormattedText("Mastery: %.1f%%", mastery)
+    end
+end
 
 -- Helper: size window to 70% width / 50% height of the screen
 local function CharacterWindowFrame_UpdateSize()
@@ -198,10 +326,8 @@ SlashCmdList["CHARACTERWINDOW"] = function()
                 SetPortraitTexture(CharacterWindowFramePortrait, "player")
             end
         end
-        -- Desaturate the Zandalari starting zone background to make it black & white
-        if CharacterWindowFrameZoneBG and CharacterWindowFrameZoneBG.SetDesaturated then
-            CharacterWindowFrameZoneBG:SetDesaturated(true)
-        end
+        -- Update the race/class-specific background
+        CharacterWindow_UpdateBackground()
 
         -- Get the player name and show it centered on the top toolbar
         local playerName = UnitName("player") or ""
@@ -212,8 +338,9 @@ SlashCmdList["CHARACTERWINDOW"] = function()
             fs:SetText(playerName)
             fs:Show()
         end
-        -- Populate equipment slot icons
+        -- Populate equipment slot icons and stats
         CharacterWindow_UpdateEquipmentSlots()
+        CharacterWindow_UpdateStatsPanel()
         CharacterWindowFrame_UpdateSize()
         CharacterWindowFrame:Show()
     end
@@ -226,6 +353,8 @@ eqFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eqFrame:SetScript("OnEvent", function()
     if CharacterWindowFrame and CharacterWindowFrame:IsShown() then
         CharacterWindow_UpdateEquipmentSlots()
+        CharacterWindow_UpdateBackground()
+        CharacterWindow_UpdateStatsPanel()
     end
 end)
 

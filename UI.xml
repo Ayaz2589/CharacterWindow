@@ -5,12 +5,14 @@
     <Size x="56" y="56"/>
     <Layers>
       <Layer level="BACKGROUND">
+        <!-- Dark square filling the entire slot -->
         <Texture name="$parentBG" setAllPoints="true">
           <Color r="0" g="0" b="0" a="0.8"/>
         </Texture>
       </Layer>
       <Layer level="BORDER">
-        <Texture name="$parentBorder" setAllPoints="true" file="Interface\Buttons\UI-Quickslot2"/>
+        <!-- Use the standard quickslot border which fills the button area -->
+        <Texture name="$parentBorder" setAllPoints="true" file="Interface\Buttons\UI-Quickslot"/>
       </Layer>
       <Layer level="ARTWORK">
         <!-- Icon texture where we will draw the equipped item -->
@@ -31,162 +33,9 @@
     </Scripts>
   </Button>
 
-  <Frame name="CharacterWindowFrame" parent="UIParent" hidden="true" movable="true" enableMouse="true"
-         clampedToScreen="true" inherits="PortraitFrameTemplate" frameStrata="HIGH">
-    <!-- Size will be set in Lua to 70% width / 50% height of the screen -->
-    <Anchors>
-      <Anchor point="CENTER"/>
-    </Anchors>
-
-    <!-- Background (inside the portrait frame border) -->
-    <Layers>
-      <Layer level="BACKGROUND">
-        <!-- Dark overlay covering the full window interior -->
-        <Texture name="$parentBG" setAllPoints="true">
-          <Color r="0" g="0" b="0" a="0.7"/>
-        </Texture>
-        <!-- Zandalari starting zone background, scaled to fill the whole window -->
-        <Texture name="$parentZoneBG" atlas="charactercreate-startingzone-zandalaritroll" setAllPoints="true"/>
-      </Layer>
-    </Layers>
-
-    <!-- Model and gear slots -->
-    <Frames>
-      <!-- Character model: fixed area on the left -->
-      <PlayerModel name="$parentModel">
-        <!-- Height scales automatically with the window via top/bottom anchors.
-             Adjust padding so the model sits closer to the weapon slots. -->
-        <Anchors>
-          <!-- Slightly shifted right so left slots stay inside the frame on wide screens -->
-          <Anchor point="TOPLEFT"    x="100"  y="-60"/>
-          <Anchor point="BOTTOMLEFT" x="100"  y="40"/>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            self:SetUnit("player")
-            self:SetPortraitZoom(0.025)
-          </OnLoad>
-        </Scripts>
-      </PlayerModel>
-
-      <!-- Simple equipment slot buttons around the model -->
-      <!-- Left side slots (stacked from top to bottom beside the model) -->
-      <Button name="$parentLeftSlot1" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentModel" relativePoint="TOPLEFT" x="-12" y="-80"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot2" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot1" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot3" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot2" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot4" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot3" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-
-      <!-- Extra left-side slots for Shirt, Tabard, Wrist -->
-      <Button name="$parentLeftSlot5" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot4" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot6" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot5" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot7" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot6" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentLeftSlot8" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot7" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-
-      <!-- Right side slots (stacked from top to bottom beside the model) -->
-      <Button name="$parentRightSlot1" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentModel" relativePoint="TOPRIGHT" x="12" y="-80"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot2" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot1" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot3" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot2" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot4" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot3" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-
-      <!-- Extra right-side slots for Rings and Trinkets -->
-      <Button name="$parentRightSlot5" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot4" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot6" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot5" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot7" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot6" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentRightSlot8" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentRightSlot7" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-        </Anchors>
-      </Button>
-
-      <!-- Weapon slots under the model: main hand and off hand -->
-      <Button name="$parentBottomSlotMainHand" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <!-- Anchor from the bottom of the model, keep slots fully inside the window -->
-          <Anchor point="BOTTOMRIGHT" relativeTo="$parentModel" relativePoint="BOTTOM" x="-32" y="40"/>
-        </Anchors>
-      </Button>
-      <Button name="$parentBottomSlotOffHand" inherits="CharacterWindowItemSlotTemplate">
-        <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="$parentModel" relativePoint="BOTTOM" x="32" y="40"/>
-        </Anchors>
-      </Button>
-
-    </Frames>
-
-    <!-- Drag + events -->
-    <Scripts>
-      <OnLoad>
-        print("CharacterWindowFrame loaded.")
-      </OnLoad>
-      <OnMouseDown>
-        self:StartMoving()
-      </OnMouseDown>
-      <OnMouseUp>
-        self:StopMovingOrSizing()
-      </OnMouseUp>
-    </Scripts>
-
-  </Frame>
+  <!-- Main window frame and all children -->
+  <Include file="CharacterWindow_MainFrame.xml"/>
+  <!-- Right-side stats panel (Item Level, Attributes, Enhancements) -->
+  <Include file="CharacterWindow_StatsPanel.xml"/>
 
 </Ui>
-
