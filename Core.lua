@@ -329,12 +329,12 @@ SlashCmdList["CHARACTERWINDOW"] = function()
         -- Update the race/class-specific background
         CharacterWindow_UpdateBackground()
 
-        -- Get the player name and show it centered on the top toolbar
+        -- Get the player name and show it centered on the top toolbar (using template TitleText)
         local playerName = UnitName("player") or ""
         if CharacterWindowFrame.TitleText then
             local fs = CharacterWindowFrame.TitleText
             fs:ClearAllPoints()
-            fs:SetPoint("TOP", CharacterWindowFrame, "TOP", 0, -4)
+            fs:SetPoint("CENTER", CharacterWindowFrame, "TOP", 0, -12)
             fs:SetText(playerName)
             fs:Show()
         end

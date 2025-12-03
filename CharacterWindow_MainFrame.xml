@@ -14,9 +14,10 @@
         <Texture name="$parentBG" setAllPoints="true">
           <Color r="0" g="0" b="0" a="0.7"/>
         </Texture>
-        <!-- Zandalari starting zone background, scaled to fill the whole window -->
-        <Texture name="$parentZoneBG" atlas="charactercreate-startingzone-zandalaritroll" setAllPoints="true"/>
+        <!-- Race/class-specific starting zone background, updated from Lua -->
+        <Texture name="$parentZoneBG" setAllPoints="true"/>
       </Layer>
+
     </Layers>
 
     <!-- Model and gear slots -->
