@@ -1,26 +1,139 @@
 local addonName, ns = ...
 
+-- Forward declaration so EQUIPMENT_SLOTS is visible inside functions
+local EQUIPMENT_SLOTS
+
 -- Helper: size window to 70% width / 50% height of the screen
 local function CharacterWindowFrame_UpdateSize()
     if not CharacterWindowFrame or not UIParent then
         return
     end
+
     local screenW, screenH = UIParent:GetWidth(), UIParent:GetHeight()
-    if screenW and screenH then
-        CharacterWindowFrame:SetSize(screenW * 0.7, screenH * 0.7)
+    if not (screenW and screenH) then
+        return
+    end
+
+    local frameW = screenW * 0.7
+    local frameH = screenH * 0.8
+
+    -- Resize the window itself
+    CharacterWindowFrame:SetSize(frameW, frameH)
+
+    -- Let the model height be driven by its top/bottom anchors,
+    -- but make its width scale with the window.
+    if CharacterWindowFrameModel then
+        local modelW = frameW * 0.30 -- 30% of window width
+        CharacterWindowFrameModel:SetWidth(modelW)
+    end
+
+    -- Scale and position equipment slots so left/right columns span (almost) the same height as the model.
+    if CharacterWindowFrameModel and EQUIPMENT_SLOTS then
+        local modelH = CharacterWindowFrameModel:GetHeight()
+        if modelH and modelH > 0 then
+            -- Small gap between slots so they don't visually merge
+            local gap           = math.max(4, math.floor(modelH * 0.02))
+
+            -- Left/right column sizing (8 slots each), leave 10% padding at top/bottom
+            local visibleH      = modelH * 0.80
+            local padding       = (modelH - visibleH) / 2
+            local count         = 8
+            local leftSlotSize  = math.floor((visibleH - gap * (count - 1)) / count)
+            leftSlotSize        = math.max(32, math.min(leftSlotSize, 72))
+            local rightSlotSize = leftSlotSize
+
+            -- Apply sizes to all slots
+            for _, slot in ipairs(EQUIPMENT_SLOTS) do
+                local button = _G[slot.frameName]
+                if button then
+                    local size = slot.frameName:find("LeftSlot", 1, true) and leftSlotSize or rightSlotSize
+                    button:SetSize(size, size)
+                end
+            end
+
+            -- Vertically center left and right columns relative to the model's visible area,
+            -- and keep them beside (not overlapping) the character model.
+            local function positionColumn(suffixes, side)
+                local count = #suffixes
+                if count == 0 then return end
+
+                local size = leftSlotSize -- both columns use same size currently
+                local totalHeight = size * count + gap * (count - 1)
+                local startOffset = totalHeight / 2 - size / 2
+
+                for i, suffix in ipairs(suffixes) do
+                    local btn = _G["CharacterWindowFrame" .. suffix]
+                    if btn then
+                        btn:ClearAllPoints()
+                        local offsetY = startOffset - (i - 1) * (size + gap)
+                        if side == "LEFT" then
+                            -- Right edge of slot anchored to the left edge of the model
+                            btn:SetPoint("RIGHT", CharacterWindowFrameModel, "LEFT", -8, offsetY)
+                        else
+                            -- Left edge of slot anchored to the right edge of the model
+                            btn:SetPoint("LEFT", CharacterWindowFrameModel, "RIGHT", 8, offsetY)
+                        end
+                    end
+                end
+            end
+
+            if LEFT_SLOT_SUFFIXES then
+                positionColumn(LEFT_SLOT_SUFFIXES, "LEFT")
+            end
+            if RIGHT_SLOT_SUFFIXES then
+                positionColumn(RIGHT_SLOT_SUFFIXES, "RIGHT")
+            end
+        end
     end
 end
 
 -- Equipment slot configuration: which frame maps to which inventory slot
-local EQUIPMENT_SLOTS = {
-    { frameName = "CharacterWindowFrameLeftSlot1",  invToken = "HeadSlot" },
-    { frameName = "CharacterWindowFrameLeftSlot2",  invToken = "NeckSlot" },
-    { frameName = "CharacterWindowFrameLeftSlot3",  invToken = "ShoulderSlot" },
-    { frameName = "CharacterWindowFrameLeftSlot4",  invToken = "ChestSlot" },
-    { frameName = "CharacterWindowFrameRightSlot1", invToken = "HandsSlot" },
-    { frameName = "CharacterWindowFrameRightSlot2", invToken = "WaistSlot" },
-    { frameName = "CharacterWindowFrameRightSlot3", invToken = "LegsSlot" },
-    { frameName = "CharacterWindowFrameRightSlot4", invToken = "FeetSlot" },
+EQUIPMENT_SLOTS = {
+    -- Left side: core armor + back/shirt/tabard/wrist
+    { frameName = "CharacterWindowFrameLeftSlot1",          invToken = "HeadSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot2",          invToken = "NeckSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot3",          invToken = "ShoulderSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot4",          invToken = "ChestSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot5",          invToken = "BackSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot6",          invToken = "ShirtSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot7",          invToken = "TabardSlot" },
+    { frameName = "CharacterWindowFrameLeftSlot8",          invToken = "WristSlot" },
+
+    -- Right side: hands/waist/legs/feet + rings + trinkets
+    { frameName = "CharacterWindowFrameRightSlot1",         invToken = "HandsSlot" },
+    { frameName = "CharacterWindowFrameRightSlot2",         invToken = "WaistSlot" },
+    { frameName = "CharacterWindowFrameRightSlot3",         invToken = "LegsSlot" },
+    { frameName = "CharacterWindowFrameRightSlot4",         invToken = "FeetSlot" },
+    { frameName = "CharacterWindowFrameRightSlot5",         invToken = "Finger0Slot" },  -- Ring 1
+    { frameName = "CharacterWindowFrameRightSlot6",         invToken = "Finger1Slot" },  -- Ring 2
+    { frameName = "CharacterWindowFrameRightSlot7",         invToken = "Trinket0Slot" }, -- Trinket 1
+    { frameName = "CharacterWindowFrameRightSlot8",         invToken = "Trinket1Slot" }, -- Trinket 2
+
+    -- Bottom slots: weapons
+    { frameName = "CharacterWindowFrameBottomSlotMainHand", invToken = "MainHandSlot" },
+    { frameName = "CharacterWindowFrameBottomSlotOffHand",  invToken = "SecondaryHandSlot" },
+}
+
+LEFT_SLOT_SUFFIXES = {
+    "LeftSlot1",
+    "LeftSlot2",
+    "LeftSlot3",
+    "LeftSlot4",
+    "LeftSlot5",
+    "LeftSlot6",
+    "LeftSlot7",
+    "LeftSlot8",
+}
+
+RIGHT_SLOT_SUFFIXES = {
+    "RightSlot1",
+    "RightSlot2",
+    "RightSlot3",
+    "RightSlot4",
+    "RightSlot5",
+    "RightSlot6",
+    "RightSlot7",
+    "RightSlot8",
 }
 
 local function CharacterWindow_UpdateEquipmentSlots()
@@ -71,10 +184,6 @@ SlashCmdList["CHARACTERWINDOW"] = function()
     if CharacterWindowFrame:IsShown() then
         CharacterWindowFrame:Hide()
     else
-        -- Ensure title text is set on the PortraitFrame template
-        if CharacterWindowFrame.TitleText then
-            CharacterWindowFrame.TitleText:SetText("Troll Character View")
-        end
         -- Set the spec icon (or fallback to character portrait) in the frame's portrait circle
         if CharacterWindowFramePortrait then
             local specIndex = GetSpecialization and GetSpecialization()
@@ -92,6 +201,16 @@ SlashCmdList["CHARACTERWINDOW"] = function()
         -- Desaturate the Zandalari starting zone background to make it black & white
         if CharacterWindowFrameZoneBG and CharacterWindowFrameZoneBG.SetDesaturated then
             CharacterWindowFrameZoneBG:SetDesaturated(true)
+        end
+
+        -- Get the player name and show it centered on the top toolbar
+        local playerName = UnitName("player") or ""
+        if CharacterWindowFrame.TitleText then
+            local fs = CharacterWindowFrame.TitleText
+            fs:ClearAllPoints()
+            fs:SetPoint("TOP", CharacterWindowFrame, "TOP", 0, -4)
+            fs:SetText(playerName)
+            fs:Show()
         end
         -- Populate equipment slot icons
         CharacterWindow_UpdateEquipmentSlots()
