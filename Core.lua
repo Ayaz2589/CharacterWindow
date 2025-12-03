@@ -79,9 +79,29 @@ local function CharacterWindow_UpdateBackground()
 end
 
 -- Update the right-side stats panel (item level + basic stats)
+local CLASS_STATS_BG_ATLAS = {
+    MAGE        = "UI-Character-Info-Mage-BG",
+    PALADIN     = "UI-Character-Info-Paladin-BG",
+    ROGUE       = "UI-Character-Info-Rogue-BG",
+    WARLOCK     = "UI-Character-Info-Warlock-BG",
+    WARRIOR     = "UI-Character-Info-Warrior-BG",
+    MONK        = "UI-Character-Info-Monk-BG",
+    PRIEST      = "UI-Character-Info-Priest-BG",
+    SHAMAN      = "UI-Character-Info-Shaman-BG",
+    DEATHKNIGHT = "UI-Character-Info-DeathKnight-BG",
+    DEMONHUNTER = "UI-Character-Info-DemonHunter-BG",
+}
+
 local function CharacterWindow_UpdateStatsPanel()
     if not CharacterWindowStatsPanel then
         return
+    end
+
+    -- Class-specific stats background atlas
+    local _, class = UnitClass("player")
+    local atlas = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
+    if CharacterWindowStatsPanelClassBG and CharacterWindowStatsPanelClassBG.SetAtlas then
+        CharacterWindowStatsPanelClassBG:SetAtlas(atlas, true)
     end
 
     -- Item level
@@ -92,7 +112,6 @@ local function CharacterWindow_UpdateStatsPanel()
     end
 
     -- Primary stat, stamina, armor (very simple approximation)
-    local _, class = UnitClass("player")
     local primaryLabel = "Intellect"
     if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "DEMONHUNTER" then
         primaryLabel = "Agility"

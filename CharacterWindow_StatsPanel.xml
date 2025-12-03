@@ -1,8 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 
   <!-- Right-side stats panel: Item Level, Attributes, Enhancements -->
-  <Frame name="CharacterWindowStatsPanel" parent="CharacterWindowFrame">
-    <Size x="260" y="0"/>
+  <!-- Use a simple built-in bordered template instead of Backdrop XML -->
+  <Frame name="CharacterWindowStatsPanel" parent="CharacterWindowFrame" inherits="TooltipBorderedFrameTemplate">
+    <Size x="350" y="0"/>
     <Anchors>
       <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-20" y="-80"/>
       <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="40"/>
@@ -10,33 +11,64 @@
 
     <Layers>
       <Layer level="BACKGROUND">
-        <Texture name="$parentBG" setAllPoints="true">
+        <!-- Class-themed stats background atlas (set from Lua) -->
+        <Texture name="$parentClassBG" setAllPoints="true"/>
+
+        <!-- Dark overlay inset so it sits inside the TooltipBorderedFrameTemplate border -->
+        <Texture name="$parentBG">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="4" y="-4"/>
+            <Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
+          </Anchors>
           <Color r="0" g="0" b="0" a="0.75"/>
         </Texture>
       </Layer>
 
       <Layer level="ARTWORK">
-        <!-- Section titles -->
+        <!-- Title backgrounds sized to (almost) the full inner width of the stats panel -->
+        <Texture name="$parentItemLevelTitleBG" atlas="UI-Character-Info-Title">
+          <Size x="334" y="52"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" x="8" y="-16"/>
+          </Anchors>
+        </Texture>
+        <Texture name="$parentAttributesTitleBG" atlas="UI-Character-Info-Title">
+          <Size x="334" y="48"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
+          </Anchors>
+        </Texture>
+        <Texture name="$parentEnhancementsTitleBG" atlas="UI-Character-Info-Title">
+          <Size x="334" y="48"/>
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOMLEFT" x="0" y="-40"/>
+          </Anchors>
+        </Texture>
+
+        <!-- Section titles (anchored to their title backgrounds, centered) -->
         <FontString name="$parentItemLevelLabel" inherits="GameFontNormalLarge" text="Item Level">
           <Anchors>
-            <Anchor point="TOPLEFT" x="16" y="-16"/>
+            <Anchor point="CENTER" relativeTo="$parentItemLevelTitleBG" relativePoint="CENTER" x="0" y="0"/>
           </Anchors>
+          <FontHeight val="26"/>
         </FontString>
-        <FontString name="$parentAttributesLabel" inherits="GameFontNormal" text="Attributes">
+        <FontString name="$parentAttributesLabel" inherits="GameFontNormalLarge" text="Attributes">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentItemLevelLabel" relativePoint="BOTTOMLEFT" x="0" y="-32"/>
+            <Anchor point="CENTER" relativeTo="$parentAttributesTitleBG" relativePoint="CENTER" x="0" y="0"/>
           </Anchors>
+          <FontHeight val="26"/>
         </FontString>
-        <FontString name="$parentEnhancementsLabel" inherits="GameFontNormal" text="Enhancements">
+        <FontString name="$parentEnhancementsLabel" inherits="GameFontNormalLarge" text="Enhancements">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLabel" relativePoint="BOTTOMLEFT" x="0" y="-64"/>
+            <Anchor point="CENTER" relativeTo="$parentEnhancementsTitleBG" relativePoint="CENTER" x="0" y="0"/>
           </Anchors>
+          <FontHeight val="26"/>
         </FontString>
 
-        <!-- Item level value -->
-        <FontString name="$parentItemLevelValue" inherits="GameFontHighlightLarge">
+        <!-- Item level value: centered, on its own line under the (taller) Item Level title -->
+        <FontString name="$parentItemLevelValue" inherits="GameFontHighlightLarge" justifyH="CENTER">
           <Anchors>
-            <Anchor point="LEFT" relativeTo="$parentItemLevelLabel" relativePoint="RIGHT" x="16" y="0"/>
+            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-18"/>
           </Anchors>
         </FontString>
 
