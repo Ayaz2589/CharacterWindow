@@ -1,0 +1,10 @@
+## Interface: 110105
+## Title: Character Window
+## Author: Ayaz
+## Version: 1.0.0
+## Notes: Custom character paperdoll window with model, gear slots, and spec icon.
+
+UI.xml
+Core.lua
+
+

@@ -1,0 +1,132 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Simple item slot template used around the character model -->
+  <Button name="CharacterWindowItemSlotTemplate" virtual="true">
+    <Size x="56" y="56"/>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentBG" setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.8"/>
+        </Texture>
+      </Layer>
+      <Layer level="BORDER">
+        <Texture name="$parentBorder" setAllPoints="true" file="Interface\Buttons\UI-Quickslot2"/>
+      </Layer>
+      <Layer level="ARTWORK">
+        <!-- Icon texture where we will draw the equipped item -->
+        <Texture name="$parentIcon" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter>
+        if CharacterWindow_EquipSlot_OnEnter then
+          CharacterWindow_EquipSlot_OnEnter(self)
+        end
+      </OnEnter>
+      <OnLeave>
+        if CharacterWindow_EquipSlot_OnLeave then
+          CharacterWindow_EquipSlot_OnLeave(self)
+        end
+      </OnLeave>
+    </Scripts>
+  </Button>
+
+  <Frame name="CharacterWindowFrame" parent="UIParent" hidden="true" movable="true" enableMouse="true"
+         clampedToScreen="true" inherits="PortraitFrameTemplate" frameStrata="HIGH">
+    <!-- Size will be set in Lua to 70% width / 50% height of the screen -->
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+
+    <!-- Background (inside the portrait frame border) -->
+    <Layers>
+      <Layer level="BACKGROUND">
+        <!-- Dark overlay covering the full window interior -->
+        <Texture name="$parentBG" setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.7"/>
+        </Texture>
+        <!-- Zandalari starting zone background, scaled to fill the whole window -->
+        <Texture name="$parentZoneBG" atlas="charactercreate-startingzone-zandalaritroll" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+
+    <!-- Model and gear slots -->
+    <Frames>
+      <!-- Character model: fixed area on the left -->
+      <PlayerModel name="$parentModel">
+        <Size x="350" y="700"/>
+        <Anchors>
+          <Anchor point="LEFT" x="80" y="-60"/>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            self:SetUnit("player")
+            self:SetPortraitZoom(0.05)
+          </OnLoad>
+        </Scripts>
+      </PlayerModel>
+
+      <!-- Simple equipment slot buttons around the model -->
+      <!-- Left side slots (spaced further apart) -->
+      <Button name="$parentLeftSlot1" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentModel" relativePoint="LEFT" x="-12" y="160"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentLeftSlot2" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentModel" relativePoint="LEFT" x="-12" y="80"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentLeftSlot3" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentModel" relativePoint="LEFT" x="-12" y="0"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentLeftSlot4" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentModel" relativePoint="LEFT" x="-12" y="-80"/>
+        </Anchors>
+      </Button>
+
+      <!-- Right side slots (spaced further apart) -->
+      <Button name="$parentRightSlot1" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentModel" relativePoint="RIGHT" x="12" y="160"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentRightSlot2" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentModel" relativePoint="RIGHT" x="12" y="80"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentRightSlot3" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentModel" relativePoint="RIGHT" x="12" y="0"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentRightSlot4" inherits="CharacterWindowItemSlotTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentModel" relativePoint="RIGHT" x="12" y="-80"/>
+        </Anchors>
+      </Button>
+
+    </Frames>
+
+    <!-- Drag + events -->
+    <Scripts>
+      <OnLoad>
+        print("CharacterWindowFrame loaded.")
+      </OnLoad>
+      <OnMouseDown>
+        self:StartMoving()
+      </OnMouseDown>
+      <OnMouseUp>
+        self:StopMovingOrSizing()
+      </OnMouseUp>
+    </Scripts>
+
+  </Frame>
+
+</Ui>
+
