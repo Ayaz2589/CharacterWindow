@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 
   <!-- Simple item slot template used around the character model -->
-  <Button name="CharacterWindowItemSlotTemplate" virtual="true">
+  <Button name="CharacterWindowItemSlotTemplate" virtual="true" registerForDrag="LeftButton">
     <Size x="56" y="56"/>
     <Layers>
       <Layer level="BACKGROUND">
@@ -30,6 +30,26 @@
           CharacterWindow_EquipSlot_OnLeave(self)
         end
       </OnLeave>
+      <OnClick>
+        if CharacterWindow_EquipSlot_OnClick then
+          CharacterWindow_EquipSlot_OnClick(self, button)
+        end
+      </OnClick>
+      <OnDragStart>
+        if CharacterWindow_EquipSlot_OnDragStart then
+          CharacterWindow_EquipSlot_OnDragStart(self)
+        end
+      </OnDragStart>
+      <OnReceiveDrag>
+        if CharacterWindow_EquipSlot_OnReceiveDrag then
+          CharacterWindow_EquipSlot_OnReceiveDrag(self)
+        end
+      </OnReceiveDrag>
+      <OnDragStop>
+        if CharacterWindow_EquipSlot_OnDragStop then
+          CharacterWindow_EquipSlot_OnDragStop(self)
+        end
+      </OnDragStop>
     </Scripts>
   </Button>
 

@@ -43,7 +43,7 @@
         <Texture name="$parentEnhancementsTitleBG" atlas="UI-Character-Info-Title">
           <Size x="300" y="55"/>
           <Anchors>
-            <!-- Centered directly under the Attributes title, with a larger vertical gap between sections -->
+            <!-- Centered directly under the Attributes title, with a larger /vertical gap between sections -->
             <Anchor point="TOP" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOM" x="0" y="-80"/>
           </Anchors>
         </Texture>

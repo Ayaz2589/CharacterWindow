@@ -102,6 +102,34 @@ local function CharacterWindow_SetFontSize(fs, size)
     end
 end
 
+-- Refresh the player model to reflect current appearance / equipment
+local function CharacterWindow_RefreshModel()
+    if not CharacterWindowFrameModel then
+        return
+    end
+
+    -- Be aggressive so appearance always matches current equipment.
+    if CharacterWindowFrameModel.ClearModel then
+        CharacterWindowFrameModel:ClearModel()
+    end
+
+    if CharacterWindowFrameModel.SetUnit then
+        CharacterWindowFrameModel:SetUnit("player")
+    end
+
+    if CharacterWindowFrameModel.SetPortraitZoom then
+        CharacterWindowFrameModel:SetPortraitZoom(0.025)
+    end
+
+    if CharacterWindowFrameModel.ResetCamera then
+        CharacterWindowFrameModel:ResetCamera()
+    end
+
+    if CharacterWindowFrameModel.SetAnimation then
+        CharacterWindowFrameModel:SetAnimation(0)
+    end
+end
+
 local function CharacterWindow_UpdateStatsPanel()
     if not CharacterWindowStatsPanel then
         return
@@ -394,6 +422,8 @@ local function CharacterWindow_UpdateEquipmentSlots()
             end
         end
     end
+    -- Ensure the player model reflects any newly equipped/unequipped items
+    CharacterWindow_RefreshModel()
 end
 
 -- Tooltip handlers for equipment slots (called from XML)
@@ -409,6 +439,71 @@ end
 
 function CharacterWindow_EquipSlot_OnLeave(self)
     GameTooltip:Hide()
+end
+
+local function CharacterWindow_SetSlotDesaturated(self, desaturated)
+    if not self then
+        return
+    end
+    local icon = self.Icon
+    if not icon and self.GetName then
+        local name = self:GetName()
+        if name then
+            icon = _G[name .. "Icon"]
+        end
+    end
+    if icon and icon.SetDesaturated then
+        icon:SetDesaturated(desaturated and true or false)
+    end
+end
+
+-- Allow dragging items out of the equipment slots / equipping from the cursor or bags
+function CharacterWindow_EquipSlot_OnDragStart(self)
+    if not self or not self.invSlotId then
+        return
+    end
+    -- Visually gray out the icon while the user is dragging it
+    CharacterWindow_SetSlotDesaturated(self, true)
+    -- Pick up the equipped item from this inventory slot
+    PickupInventoryItem(self.invSlotId)
+end
+
+function CharacterWindow_EquipSlot_OnReceiveDrag(self)
+    if not self or not self.invSlotId then
+        return
+    end
+    -- If the cursor has an item (from bags, another slot, etc.), equip it into this slot
+    if CursorHasItem() and EquipCursorItem then
+        EquipCursorItem(self.invSlotId)
+    end
+    -- Drag ended on this slot; restore normal icon coloring (UpdateEquipmentSlots will also refresh)
+    CharacterWindow_SetSlotDesaturated(self, false)
+end
+
+function CharacterWindow_EquipSlot_OnClick(self, button)
+    if not self or not self.invSlotId then
+        return
+    end
+
+    if button == "RightButton" then
+        -- Right-click behaves like the default paper doll: pick up the equipped item
+        CharacterWindow_SetSlotDesaturated(self, true)
+        PickupInventoryItem(self.invSlotId)
+        return
+    end
+
+    -- Left-click: if we have an item on the cursor, try to equip it, otherwise pick up this slot's item
+    if CursorHasItem() and EquipCursorItem then
+        EquipCursorItem(self.invSlotId)
+    else
+        CharacterWindow_SetSlotDesaturated(self, true)
+        PickupInventoryItem(self.invSlotId)
+    end
+end
+
+function CharacterWindow_EquipSlot_OnDragStop(self)
+    -- When the drag ends (item placed or cancelled), restore normal icon coloring.
+    CharacterWindow_SetSlotDesaturated(self, false)
 end
 
 -- Slash command to toggle the window
@@ -435,8 +530,9 @@ SlashCmdList["CHARACTERWINDOW"] = function()
                 SetPortraitTexture(CharacterWindowFramePortrait, "player")
             end
         end
-        -- Update the race/class-specific background
+        -- Update the race/class-specific background and player model
         CharacterWindow_UpdateBackground()
+        CharacterWindow_RefreshModel()
 
         -- Update the character summary on the main frame (Level + Spec + Class)
         if CharacterWindowFrameCharacterSummary then
@@ -530,12 +626,20 @@ end
 -- Keep equipment slots updated when gear changes while the window is open
 local eqFrame = CreateFrame("Frame")
 eqFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+eqFrame:RegisterEvent("UNIT_INVENTORY_CHANGED")
+eqFrame:RegisterEvent("UNIT_MODEL_CHANGED")
 eqFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-eqFrame:SetScript("OnEvent", function()
+eqFrame:SetScript("OnEvent", function(_, event, arg1)
+    -- Only care about the player unit for UNIT_* events
+    if (event == "UNIT_INVENTORY_CHANGED" or event == "UNIT_MODEL_CHANGED") and arg1 ~= "player" then
+        return
+    end
+
     if CharacterWindowFrame and CharacterWindowFrame:IsShown() then
         CharacterWindow_UpdateEquipmentSlots()
         CharacterWindow_UpdateBackground()
         CharacterWindow_UpdateStatsPanel()
+        CharacterWindow_RefreshModel()
     end
 end)
 
