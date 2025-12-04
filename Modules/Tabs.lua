@@ -11,20 +11,30 @@ function CharacterWindow_SwitchTab(tabIndex)
   -- Update all tabs: show/hide left/right/center textures based on active state
   for i, tab in ipairs(tabs) do
     if tab then
-      local left = tab.Left or _G[tab:GetName() .. "Left"]
-      local right = tab.Right or _G[tab:GetName() .. "Right"]
-      local center = tab.Center or _G[tab:GetName() .. "Center"]
+      local tabName = tab:GetName()
+      local left = _G[tabName .. "Left"]
+      local right = _G[tabName .. "Right"]
+      local center = _G[tabName .. "Center"]
+      local inactiveLeft = _G[tabName .. "InactiveLeft"]
+      local inactiveRight = _G[tabName .. "InactiveRight"]
+      local inactiveCenter = _G[tabName .. "InactiveCenter"]
 
       if i == tabIndex then
-        -- Active tab - show left, right, and center textures
+        -- Active tab - show active textures, hide inactive textures
         if left then left:Show() end
         if right then right:Show() end
         if center then center:Show() end
+        if inactiveLeft then inactiveLeft:Hide() end
+        if inactiveRight then inactiveRight:Hide() end
+        if inactiveCenter then inactiveCenter:Hide() end
       else
-        -- Inactive tab - hide left, right, and center textures
+        -- Inactive tab - hide active textures, show inactive textures
         if left then left:Hide() end
         if right then right:Hide() end
         if center then center:Hide() end
+        if inactiveLeft then inactiveLeft:Show() end
+        if inactiveRight then inactiveRight:Show() end
+        if inactiveCenter then inactiveCenter:Show() end
       end
     end
   end

@@ -63,19 +63,22 @@ function CharacterWindow_UpdateStatsPanel()
     -- Attribute lines: labels on the left, values right-aligned on the same row
     if CharacterWindowStatsPanelAttributesLine1Label and CharacterWindowStatsPanelAttributesLine1Value then
         CharacterWindowStatsPanelAttributesLine1Label:SetText(primaryLabel .. ":")
-        CharacterWindowStatsPanelAttributesLine1Value:SetFormattedText("%d", primaryEff or primaryBase or 0)
+        local primaryValue = primaryEff or primaryBase or 0
+        CharacterWindowStatsPanelAttributesLine1Value:SetText(BreakUpLargeNumbers(primaryValue))
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine1Label, 16)
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine1Value, 16)
     end
     if CharacterWindowStatsPanelAttributesLine2Label and CharacterWindowStatsPanelAttributesLine2Value then
         CharacterWindowStatsPanelAttributesLine2Label:SetText("Stamina:")
-        CharacterWindowStatsPanelAttributesLine2Value:SetFormattedText("%d", staminaEff or staminaBase or 0)
+        local staminaValue = staminaEff or staminaBase or 0
+        CharacterWindowStatsPanelAttributesLine2Value:SetText(BreakUpLargeNumbers(staminaValue))
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine2Label, 16)
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine2Value, 16)
     end
     if CharacterWindowStatsPanelAttributesLine3Label and CharacterWindowStatsPanelAttributesLine3Value then
         CharacterWindowStatsPanelAttributesLine3Label:SetText("Armor:")
-        CharacterWindowStatsPanelAttributesLine3Value:SetFormattedText("%d", effectiveArmor or baseArmor or 0)
+        local armorValue = effectiveArmor or baseArmor or 0
+        CharacterWindowStatsPanelAttributesLine3Value:SetText(BreakUpLargeNumbers(armorValue))
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine3Label, 16)
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine3Value, 16)
     end
@@ -162,6 +165,87 @@ function CharacterWindow_UpdateStatsPanel()
     )
 end
 
+-- Tooltip helper functions
+local function AddTooltipSection(title, valueLabel, value, description, baseValue, effectiveValue)
+    GameTooltip:SetText(title, 1, 1, 1)
+    GameTooltip:AddLine(" ")
+    if valueLabel and value then
+        GameTooltip:AddLine(string.format("%s: %s", valueLabel, value), 1, 1, 1)
+    end
+    -- Add base/bonus breakdown if provided
+    if baseValue and effectiveValue and baseValue ~= effectiveValue then
+        GameTooltip:AddLine(string.format("Base: %d", baseValue), 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(string.format("Bonus: +%d", (effectiveValue - baseValue)), 0, 1, 0)
+    end
+    if description then
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(description, 0.7, 0.7, 0.7, true)
+    end
+end
+
+local function GetPrimaryStatLabel(class)
+    if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "DEMONHUNTER" then
+        return "Agility", 2
+    elseif class == "PALADIN" or class == "DEATHKNIGHT" then
+        return "Strength", 1
+    else
+        return "Intellect", 4
+    end
+end
+
+-- Stat tooltip configuration
+local STAT_TOOLTIPS = {
+    crit = {
+        title = "Critical Strike",
+        valueLabel = "Chance",
+        getValue = function() return GetCritChance and GetCritChance() or 0 end,
+        format = "%.2f%%",
+        description = "Increases chance for spells and attacks to critically hit for 200% damage."
+    },
+    haste = {
+        title = "Haste",
+        valueLabel = "Rating",
+        getValue = function() return GetHaste and GetHaste() or 0 end,
+        format = "%.2f%%",
+        description = "Increases casting speed, attack speed, and resource regeneration rate."
+    },
+    mastery = {
+        title = "Mastery",
+        valueLabel = "Rating",
+        getValue = function() return GetMasteryEffect and GetMasteryEffect() or 0 end,
+        format = "%.2f%%",
+        description = "Increases the effectiveness of your class-specific Mastery ability."
+    },
+    versatility = {
+        title = "Versatility",
+        valueLabel = "Rating",
+        getValue = function()
+            if GetVersatility then
+                return GetVersatility() or 0
+            elseif GetCombatRatingBonus and CR_VERSATILITY_DAMAGE_DONE then
+                return GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) or 0
+            end
+            return 0
+        end,
+        format = "%.2f%%",
+        description = "Increases damage and healing done, and reduces damage taken."
+    },
+    leech = {
+        title = "Leech",
+        valueLabel = "Rating",
+        getValue = function() return GetLifesteal and GetLifesteal() or 0 end,
+        format = "%.2f%%",
+        description = "Heals you for a percentage of damage dealt."
+    },
+    speed = {
+        title = "Speed",
+        valueLabel = "Rating",
+        getValue = function() return GetSpeed and GetSpeed() or 0 end,
+        format = "%.2f%%",
+        description = "Increases movement speed."
+    }
+}
+
 -- Tooltip functions for stats
 function CharacterWindow_ShowStatTooltip(self, statType)
     if not GameTooltip then
@@ -173,106 +257,38 @@ function CharacterWindow_ShowStatTooltip(self, statType)
 
     local _, class = UnitClass("player")
 
+    -- Handle special cases
     if statType == "itemlevel" then
         local avg, equipped = GetAverageItemLevel()
-        local ilvl = equipped or avg
-        GameTooltip:SetText("Item Level", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Equipped: %.1f", equipped or avg or 0), 1, 1, 1)
+        AddTooltipSection("Item Level", "Equipped", string.format("%.1f", equipped or avg or 0))
         if avg and equipped and avg ~= equipped then
             GameTooltip:AddLine(string.format("Average: %.1f", avg), 0.7, 0.7, 0.7)
         end
     elseif statType == "primary" then
-        local primaryLabel = "Intellect"
-        if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "DEMONHUNTER" then
-            primaryLabel = "Agility"
-        elseif class == "PALADIN" or class == "DEATHKNIGHT" then
-            primaryLabel = "Strength"
-        end
-
-        local statIndex = primaryLabel == "Strength" and 1 or (primaryLabel == "Agility" and 2 or 4)
+        local primaryLabel, statIndex = GetPrimaryStatLabel(class)
         local primaryBase, primaryEff = UnitStat("player", statIndex)
-
-        GameTooltip:SetText(primaryLabel, 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Total: %d", primaryEff or primaryBase or 0), 1, 1, 1)
-        if primaryBase and primaryEff and primaryBase ~= primaryEff then
-            GameTooltip:AddLine(string.format("Base: %d", primaryBase), 0.7, 0.7, 0.7)
-            GameTooltip:AddLine(string.format("Bonus: +%d", (primaryEff - primaryBase)), 0, 1, 0)
-        end
+        AddTooltipSection(primaryLabel, "Total", string.format("%d", primaryEff or primaryBase or 0), nil, primaryBase,
+            primaryEff)
     elseif statType == "stamina" then
         local staminaBase, staminaEff = UnitStat("player", 3)
-        GameTooltip:SetText("Stamina", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Total: %d", staminaEff or staminaBase or 0), 1, 1, 1)
-        if staminaBase and staminaEff and staminaBase ~= staminaEff then
-            GameTooltip:AddLine(string.format("Base: %d", staminaBase), 0.7, 0.7, 0.7)
-            GameTooltip:AddLine(string.format("Bonus: +%d", (staminaEff - staminaBase)), 0, 1, 0)
-        end
+        AddTooltipSection("Stamina", "Total", string.format("%d", staminaEff or staminaBase or 0), nil, staminaBase,
+            staminaEff)
         local health = UnitHealthMax("player")
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(string.format("Health: %s", health and BreakUpLargeNumbers(health) or "0"), 0, 1, 0)
     elseif statType == "armor" then
         local baseArmor, effectiveArmor = UnitArmor("player")
-        GameTooltip:SetText("Armor", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Total: %d", effectiveArmor or baseArmor or 0), 1, 1, 1)
-        if baseArmor and effectiveArmor and baseArmor ~= effectiveArmor then
-            GameTooltip:AddLine(string.format("Base: %d", baseArmor), 0.7, 0.7, 0.7)
-            GameTooltip:AddLine(string.format("Bonus: +%d", (effectiveArmor - baseArmor)), 0, 1, 0)
-        end
+        AddTooltipSection("Armor", "Total", string.format("%d", effectiveArmor or baseArmor or 0), nil, baseArmor,
+            effectiveArmor)
         local reduction = effectiveArmor and (effectiveArmor / (effectiveArmor + 400 + 85 * UnitLevel("player"))) * 100 or
             0
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(string.format("Physical Damage Reduction: %.1f%%", reduction), 0, 1, 0)
-    elseif statType == "crit" then
-        local crit = GetCritChance and GetCritChance() or 0
-        GameTooltip:SetText("Critical Strike", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Chance: %.2f%%", crit), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases chance for spells and attacks to critically hit for 200% damage.", 0.7, 0.7, 0.7,
-            true)
-    elseif statType == "haste" then
-        local haste = GetHaste and GetHaste() or 0
-        GameTooltip:SetText("Haste", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Rating: %.2f%%", haste), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases casting speed, attack speed, and resource regeneration rate.", 0.7, 0.7, 0.7, true)
-    elseif statType == "mastery" then
-        local mastery = GetMasteryEffect and GetMasteryEffect() or 0
-        GameTooltip:SetText("Mastery", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Rating: %.2f%%", mastery), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases the effectiveness of your class-specific Mastery ability.", 0.7, 0.7, 0.7, true)
-    elseif statType == "versatility" then
-        local vers = 0
-        if GetVersatility then
-            vers = GetVersatility() or 0
-        elseif GetCombatRatingBonus and CR_VERSATILITY_DAMAGE_DONE then
-            vers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) or 0
-        end
-        GameTooltip:SetText("Versatility", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Rating: %.2f%%", vers), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases damage and healing done, and reduces damage taken.", 0.7, 0.7, 0.7, true)
-    elseif statType == "leech" then
-        local leech = GetLifesteal and GetLifesteal() or 0
-        GameTooltip:SetText("Leech", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Rating: %.2f%%", leech), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Heals you for a percentage of damage dealt.", 0.7, 0.7, 0.7, true)
-    elseif statType == "speed" then
-        local speed = GetSpeed and GetSpeed() or 0
-        GameTooltip:SetText("Speed", 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(string.format("Rating: %.2f%%", speed), 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases movement speed.", 0.7, 0.7, 0.7, true)
+        -- Handle simple stats from configuration table
+    elseif STAT_TOOLTIPS[statType] then
+        local config = STAT_TOOLTIPS[statType]
+        local value = config.getValue()
+        AddTooltipSection(config.title, config.valueLabel, string.format(config.format, value), config.description)
     end
 
     GameTooltip:Show()
