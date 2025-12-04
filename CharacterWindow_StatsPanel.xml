@@ -5,7 +5,7 @@
   <Frame name="CharacterWindowStatsPanel" parent="CharacterWindowFrame" inherits="TooltipBorderedFrameTemplate">
     <Size x="350" y="0"/>
     <Anchors>
-      <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-20" y="-80"/>
+      <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-30" y="-80"/>
       <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="40"/>
     </Anchors>
 
@@ -25,24 +25,38 @@
       </Layer>
 
       <Layer level="ARTWORK">
-        <!-- Title backgrounds sized to (almost) the full inner width of the stats panel -->
+        <!-- Title backgrounds centered within the stats panel -->
         <Texture name="$parentItemLevelTitleBG" atlas="UI-Character-Info-Title">
-          <Size x="334" y="52"/>
+          <Size x="300" y="55"/>
           <Anchors>
-            <Anchor point="TOPLEFT" x="8" y="-16"/>
+            <!-- TOP uses the horizontal center of the frame, so this centers the art -->
+            <Anchor point="TOP" x="0" y="-16"/>
           </Anchors>
         </Texture>
         <Texture name="$parentAttributesTitleBG" atlas="UI-Character-Info-Title">
-          <Size x="334" y="48"/>
+          <Size x="300" y="55"/>
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
+            <!-- Centered directly under the Item Level title, with even more vertical spacing -->
+            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-47"/>
           </Anchors>
         </Texture>
         <Texture name="$parentEnhancementsTitleBG" atlas="UI-Character-Info-Title">
-          <Size x="334" y="48"/>
+          <Size x="300" y="55"/>
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOMLEFT" x="0" y="-40"/>
+            <!-- Centered directly under the Attributes title, with a larger vertical gap between sections -->
+            <Anchor point="TOP" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOM" x="0" y="-80"/>
           </Anchors>
+        </Texture>
+
+        <!-- Item level bounce background behind the numeric value (scaled down) -->
+        <Texture name="$parentItemLevelBounce" atlas="UI-Character-Info-ItemLevel-Bounce">
+          <!-- Slightly translucent so it doesn't overpower the text -->
+          <Size x="275" y="40"/>
+          <Anchors>
+            <!-- Centered under the Item Level ribbon -->
+            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-4"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="0.3"/>
         </Texture>
 
         <!-- Section titles (anchored to their title backgrounds, centered) -->
@@ -65,45 +79,114 @@
           <FontHeight val="26"/>
         </FontString>
 
-        <!-- Item level value: centered, on its own line under the (taller) Item Level title -->
+        <!-- Item level value: centered on the bounce art -->
         <FontString name="$parentItemLevelValue" inherits="GameFontHighlightLarge" justifyH="CENTER">
           <Anchors>
-            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-18"/>
+            <Anchor point="CENTER" relativeTo="$parentItemLevelBounce" relativePoint="CENTER" x="0" y="0"/>
           </Anchors>
+          <!-- Much larger so it visually matches the default character sheet -->
+          <FontHeight val="40"/>
         </FontString>
 
-        <!-- Attribute lines (placeholders; values filled from Lua) -->
-        <FontString name="$parentAttributesLine1" inherits="GameFontHighlightSmall">
+        <!-- Attribute lines: separate label and value so they can be spaced like CSS space-between -->
+        <!-- Row 1: primary stat -->
+        <FontString name="$parentAttributesLine1Label" inherits="GameFontHighlightSmall">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLabel" relativePoint="BOTTOMLEFT" x="0" y="-4"/>
+            <!-- Lock Y to just below the Attributes title, but move slightly inward from the panel edge -->
+            <Anchor point="TOP"  relativeTo="$parentAttributesLabel" relativePoint="BOTTOM" x="0"  y="-25"/>
+            <Anchor point="LEFT" relativeTo="$parent"               relativePoint="LEFT"   x="28" y="0"/>
           </Anchors>
+          <FontHeight val="20"/>
         </FontString>
-        <FontString name="$parentAttributesLine2" inherits="GameFontHighlightSmall">
+        <FontString name="$parentAttributesLine1Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+            <!-- Align Y with the label, X to the right edge of the panel -->
+            <Anchor point="TOP"   relativeTo="$parentAttributesLine1Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                   relativePoint="RIGHT" x="-24" y="0"/>
           </Anchors>
-        </FontString>
-        <FontString name="$parentAttributesLine3" inherits="GameFontHighlightSmall">
-          <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine2" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
-          </Anchors>
+          <FontHeight val="20"/>
         </FontString>
 
-        <!-- Enhancement lines (placeholders) -->
-        <FontString name="$parentEnhancementsLine1" inherits="GameFontHighlightSmall">
+        <!-- Row 2: stamina -->
+        <FontString name="$parentAttributesLine2Label" inherits="GameFontHighlightSmall">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLabel" relativePoint="BOTTOMLEFT" x="0" y="-4"/>
+            <!-- Increased vertical gap below the first attribute row -->
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine1Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
           </Anchors>
+          <FontHeight val="20"/>
         </FontString>
-        <FontString name="$parentEnhancementsLine2" inherits="GameFontHighlightSmall">
+        <FontString name="$parentAttributesLine2Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine1" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+            <Anchor point="TOP"   relativeTo="$parentAttributesLine2Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                     relativePoint="RIGHT" x="-24" y="0"/>
           </Anchors>
+          <FontHeight val="20"/>
         </FontString>
-        <FontString name="$parentEnhancementsLine3" inherits="GameFontHighlightSmall">
+
+        <!-- Row 3: armor -->
+        <FontString name="$parentAttributesLine3Label" inherits="GameFontHighlightSmall">
           <Anchors>
-            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine2" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+            <!-- Increased vertical gap below the second attribute row -->
+            <Anchor point="TOPLEFT" relativeTo="$parentAttributesLine2Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
           </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentAttributesLine3Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentAttributesLine3Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                     relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+
+        <!-- Enhancement lines (placeholders), also split into label + value pairs -->
+        <!-- Row 1: crit -->
+        <FontString name="$parentEnhancementsLine1Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <!-- Match left inset with Attributes column, with extra vertical gap below Enhancements title -->
+            <Anchor point="TOP"  relativeTo="$parentEnhancementsLabel" relativePoint="BOTTOM" x="0"  y="-25"/>
+            <Anchor point="LEFT" relativeTo="$parent"                  relativePoint="LEFT"   x="28" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine1Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine1Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+
+        <!-- Row 2: haste -->
+        <FontString name="$parentEnhancementsLine2Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <!-- Increased vertical gap below the first enhancement row -->
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine1Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine2Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine2Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+
+        <!-- Row 3: mastery -->
+        <FontString name="$parentEnhancementsLine3Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <!-- Increased vertical gap below the second enhancement row -->
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine2Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine3Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine3Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
         </FontString>
       </Layer>
     </Layers>

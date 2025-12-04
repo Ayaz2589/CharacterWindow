@@ -6,9 +6,9 @@
     <Layers>
       <Layer level="BACKGROUND">
         <!-- Dark square filling the entire slot -->
-        <Texture name="$parentBG" setAllPoints="true">
+        <!-- <Texture name="$parentBG" setAllPoints="true">
           <Color r="0" g="0" b="0" a="0.8"/>
-        </Texture>
+        </Texture> -->
       </Layer>
       <Layer level="BORDER">
         <!-- Use the standard quickslot border which fills the button area -->

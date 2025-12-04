@@ -92,6 +92,16 @@ local CLASS_STATS_BG_ATLAS = {
     DEMONHUNTER = "UI-Character-Info-DemonHunter-BG",
 }
 
+local function CharacterWindow_SetFontSize(fs, size)
+    if not fs or not fs.SetFont then
+        return
+    end
+    local font, oldSize, flags = fs:GetFont()
+    if font and oldSize ~= size then
+        fs:SetFont(font, size, flags)
+    end
+end
+
 local function CharacterWindow_UpdateStatsPanel()
     if not CharacterWindowStatsPanel then
         return
@@ -109,6 +119,8 @@ local function CharacterWindow_UpdateStatsPanel()
     local ilvl = equipped or avg
     if CharacterWindowStatsPanelItemLevelValue and ilvl then
         CharacterWindowStatsPanelItemLevelValue:SetFormattedText("%.1f", ilvl)
+        -- Ensure the item level number is visually large regardless of XML quirks
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelItemLevelValue, 30)
     end
 
     -- Primary stat, stamina, armor (very simple approximation)
@@ -124,14 +136,24 @@ local function CharacterWindow_UpdateStatsPanel()
     local staminaBase, staminaEff = UnitStat("player", 3)
     local baseArmor, effectiveArmor = UnitArmor("player")
 
-    if CharacterWindowStatsPanelAttributesLine1 then
-        CharacterWindowStatsPanelAttributesLine1:SetFormattedText("%s: %d", primaryLabel, primaryEff or primaryBase or 0)
+    -- Attribute lines: labels on the left, values right-aligned on the same row
+    if CharacterWindowStatsPanelAttributesLine1Label and CharacterWindowStatsPanelAttributesLine1Value then
+        CharacterWindowStatsPanelAttributesLine1Label:SetText(primaryLabel .. ":")
+        CharacterWindowStatsPanelAttributesLine1Value:SetFormattedText("%d", primaryEff or primaryBase or 0)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine1Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine1Value, 16)
     end
-    if CharacterWindowStatsPanelAttributesLine2 then
-        CharacterWindowStatsPanelAttributesLine2:SetFormattedText("Stamina: %d", staminaEff or staminaBase or 0)
+    if CharacterWindowStatsPanelAttributesLine2Label and CharacterWindowStatsPanelAttributesLine2Value then
+        CharacterWindowStatsPanelAttributesLine2Label:SetText("Stamina:")
+        CharacterWindowStatsPanelAttributesLine2Value:SetFormattedText("%d", staminaEff or staminaBase or 0)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine2Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine2Value, 16)
     end
-    if CharacterWindowStatsPanelAttributesLine3 then
-        CharacterWindowStatsPanelAttributesLine3:SetFormattedText("Armor: %d", effectiveArmor or baseArmor or 0)
+    if CharacterWindowStatsPanelAttributesLine3Label and CharacterWindowStatsPanelAttributesLine3Value then
+        CharacterWindowStatsPanelAttributesLine3Label:SetText("Armor:")
+        CharacterWindowStatsPanelAttributesLine3Value:SetFormattedText("%d", effectiveArmor or baseArmor or 0)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine3Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine3Value, 16)
     end
 
     -- Basic enhancements: Crit, Haste, Mastery
@@ -139,14 +161,24 @@ local function CharacterWindow_UpdateStatsPanel()
     local haste   = GetHaste and GetHaste() or 0
     local mastery = GetMasteryEffect and GetMasteryEffect() or 0
 
-    if CharacterWindowStatsPanelEnhancementsLine1 then
-        CharacterWindowStatsPanelEnhancementsLine1:SetFormattedText("Crit: %.1f%%", crit)
+    -- Enhancement lines: same pattern as attributes
+    if CharacterWindowStatsPanelEnhancementsLine1Label and CharacterWindowStatsPanelEnhancementsLine1Value then
+        CharacterWindowStatsPanelEnhancementsLine1Label:SetText("Crit:")
+        CharacterWindowStatsPanelEnhancementsLine1Value:SetFormattedText("%.1f%%", crit)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine1Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine1Value, 16)
     end
-    if CharacterWindowStatsPanelEnhancementsLine2 then
-        CharacterWindowStatsPanelEnhancementsLine2:SetFormattedText("Haste: %.1f%%", haste)
+    if CharacterWindowStatsPanelEnhancementsLine2Label and CharacterWindowStatsPanelEnhancementsLine2Value then
+        CharacterWindowStatsPanelEnhancementsLine2Label:SetText("Haste:")
+        CharacterWindowStatsPanelEnhancementsLine2Value:SetFormattedText("%.1f%%", haste)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine2Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine2Value, 16)
     end
-    if CharacterWindowStatsPanelEnhancementsLine3 then
-        CharacterWindowStatsPanelEnhancementsLine3:SetFormattedText("Mastery: %.1f%%", mastery)
+    if CharacterWindowStatsPanelEnhancementsLine3Label and CharacterWindowStatsPanelEnhancementsLine3Value then
+        CharacterWindowStatsPanelEnhancementsLine3Label:SetText("Mastery:")
+        CharacterWindowStatsPanelEnhancementsLine3Value:SetFormattedText("%.1f%%", mastery)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine3Label, 16)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine3Value, 16)
     end
 end
 
@@ -170,7 +202,7 @@ local function CharacterWindowFrame_UpdateSize()
     -- Let the model height be driven by its top/bottom anchors,
     -- but make its width scale with the window.
     if CharacterWindowFrameModel then
-        local modelW = frameW * 0.30 -- 30% of window width
+        local modelW = frameW * 0.40 -- 30% of window width
         CharacterWindowFrameModel:SetWidth(modelW)
     end
 
@@ -294,13 +326,13 @@ local function CharacterWindow_UpdateEquipmentSlots()
                 -- Store info on the button so tooltip handlers can use it
                 button.invSlotId = invSlotId
                 button.invUnit = "player"
-                if texture then
-                    icon:SetTexture(texture)
-                    icon:Show()
-                else
-                    icon:SetTexture(nil)
-                    icon:Hide()
+                -- Always show a full-size icon so empty and filled slots look the same size.
+                -- Use the real item icon when present, otherwise fall back to a generic empty-slot texture.
+                if not texture then
+                    texture = "Interface\\PaperDoll\\UI-Backpack-EmptySlot"
                 end
+                icon:SetTexture(texture)
+                icon:Show()
             end
         end
     end

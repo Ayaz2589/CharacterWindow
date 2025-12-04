@@ -43,7 +43,7 @@
       <!-- Left side slots (stacked from top to bottom beside the model) -->
       <Button name="$parentLeftSlot1" inherits="CharacterWindowItemSlotTemplate">
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="$parentModel" relativePoint="TOPLEFT" x="-12" y="-80"/>
+          <Anchor point="TOPRIGHT" relativeTo="$parentModel" relativePoint="TOPLEFT" x="-12" y="-90"/>
         </Anchors>
       </Button>
       <Button name="$parentLeftSlot2" inherits="CharacterWindowItemSlotTemplate">
@@ -131,13 +131,13 @@
       <!-- Weapon slots under the model: main hand and off hand -->
       <Button name="$parentBottomSlotMainHand" inherits="CharacterWindowItemSlotTemplate">
         <Anchors>
-          <!-- Anchor from the bottom of the model, keep slots fully inside the window -->
-          <Anchor point="BOTTOMRIGHT" relativeTo="$parentModel" relativePoint="BOTTOM" x="-32" y="40"/>
+          <!-- Anchor from the bottom of the model; smaller X offset so weapon slots sit closer together -->
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentModel" relativePoint="BOTTOM" x="-6" y="10"/>
         </Anchors>
       </Button>
       <Button name="$parentBottomSlotOffHand" inherits="CharacterWindowItemSlotTemplate">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="$parentModel" relativePoint="BOTTOM" x="32" y="40"/>
+          <Anchor point="BOTTOMLEFT" relativeTo="$parentModel" relativePoint="BOTTOM" x="6" y="10"/>
         </Anchors>
       </Button>
 
