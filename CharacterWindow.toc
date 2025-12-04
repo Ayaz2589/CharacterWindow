@@ -8,6 +8,7 @@ UI/UI.xml
 Modules/Character.lua
 Modules/Equipment.lua
 Modules/Stats.lua
+Modules/Tabs.lua
 Modules/Core.lua
 
 
