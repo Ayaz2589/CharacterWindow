@@ -107,12 +107,14 @@ local function CharacterWindow_UpdateStatsPanel()
         return
     end
 
-    -- Class-specific stats background atlas
+    -- Class for stats panel background
     local _, class = UnitClass("player")
-    local atlas = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
+    local atlas    = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
     if CharacterWindowStatsPanelClassBG and CharacterWindowStatsPanelClassBG.SetAtlas then
         CharacterWindowStatsPanelClassBG:SetAtlas(atlas, true)
     end
+
+    -- Character summary has moved to the main frame; no summary text in the stats panel
 
     -- Item level
     local avg, equipped = GetAverageItemLevel()
@@ -156,30 +158,86 @@ local function CharacterWindow_UpdateStatsPanel()
         CharacterWindow_SetFontSize(CharacterWindowStatsPanelAttributesLine3Value, 16)
     end
 
-    -- Basic enhancements: Crit, Haste, Mastery
+    -- Basic enhancements: Crit, Haste, Mastery (+ optional Vers, Leech, Speed)
     local crit    = GetCritChance and GetCritChance() or 0
     local haste   = GetHaste and GetHaste() or 0
     local mastery = GetMasteryEffect and GetMasteryEffect() or 0
+    local vers    = 0
+    local leech   = 0
+    local speed   = 0
 
-    -- Enhancement lines: same pattern as attributes
-    if CharacterWindowStatsPanelEnhancementsLine1Label and CharacterWindowStatsPanelEnhancementsLine1Value then
-        CharacterWindowStatsPanelEnhancementsLine1Label:SetText("Crit:")
-        CharacterWindowStatsPanelEnhancementsLine1Value:SetFormattedText("%.1f%%", crit)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine1Label, 16)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine1Value, 16)
+    if GetVersatility then
+        vers = GetVersatility() or 0
+    elseif GetCombatRatingBonus and CR_VERSATILITY_DAMAGE_DONE then
+        vers = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) or 0
     end
-    if CharacterWindowStatsPanelEnhancementsLine2Label and CharacterWindowStatsPanelEnhancementsLine2Value then
-        CharacterWindowStatsPanelEnhancementsLine2Label:SetText("Haste:")
-        CharacterWindowStatsPanelEnhancementsLine2Value:SetFormattedText("%.1f%%", haste)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine2Label, 16)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine2Value, 16)
+
+    if GetLifesteal then
+        leech = GetLifesteal() or 0
     end
-    if CharacterWindowStatsPanelEnhancementsLine3Label and CharacterWindowStatsPanelEnhancementsLine3Value then
-        CharacterWindowStatsPanelEnhancementsLine3Label:SetText("Mastery:")
-        CharacterWindowStatsPanelEnhancementsLine3Value:SetFormattedText("%.1f%%", mastery)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine3Label, 16)
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelEnhancementsLine3Value, 16)
+
+    if GetSpeed then
+        speed = GetSpeed() or 0
     end
+
+    -- Helper to show/hide an enhancement row based on value
+    local function SetEnhancementRow(labelFS, valueFS, labelText, value)
+        if not (labelFS and valueFS) then
+            return
+        end
+        -- Treat very small values as "missing"
+        if value and math.abs(value) > 0.01 then
+            labelFS:SetText(labelText)
+            valueFS:SetFormattedText("%.1f%%", value)
+            labelFS:Show()
+            valueFS:Show()
+            CharacterWindow_SetFontSize(labelFS, 16)
+            CharacterWindow_SetFontSize(valueFS, 16)
+        else
+            labelFS:Hide()
+            valueFS:Hide()
+        end
+    end
+
+    -- Always show core three
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine1Label,
+        CharacterWindowStatsPanelEnhancementsLine1Value,
+        "Critical Strike:",
+        crit
+    )
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine2Label,
+        CharacterWindowStatsPanelEnhancementsLine2Value,
+        "Haste:",
+        haste
+    )
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine3Label,
+        CharacterWindowStatsPanelEnhancementsLine3Value,
+        "Mastery:",
+        mastery
+    )
+
+    -- Optional: Versatility, Leech, Speed only if present
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine4Label,
+        CharacterWindowStatsPanelEnhancementsLine4Value,
+        "Versatility:",
+        vers
+    )
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine5Label,
+        CharacterWindowStatsPanelEnhancementsLine5Value,
+        "Leech:",
+        leech
+    )
+    SetEnhancementRow(
+        CharacterWindowStatsPanelEnhancementsLine6Label,
+        CharacterWindowStatsPanelEnhancementsLine6Value,
+        "Speed:",
+        speed
+    )
 end
 
 -- Helper: size window to 70% width / 50% height of the screen
@@ -380,15 +438,87 @@ SlashCmdList["CHARACTERWINDOW"] = function()
         -- Update the race/class-specific background
         CharacterWindow_UpdateBackground()
 
-        -- Get the player name and show it centered on the top toolbar (using template TitleText)
-        local playerName = UnitName("player") or ""
-        if CharacterWindowFrame.TitleText then
-            local fs = CharacterWindowFrame.TitleText
-            fs:ClearAllPoints()
-            fs:SetPoint("CENTER", CharacterWindowFrame, "TOP", 0, -12)
-            fs:SetText(playerName)
-            fs:Show()
+        -- Update the character summary on the main frame (Level + Spec + Class)
+        if CharacterWindowFrameCharacterSummary then
+            local level = UnitLevel and UnitLevel("player") or nil
+
+            -- Build the "Elemental Shaman" portion with class color and only the first letter of the class name capitalized
+            local specName
+            if GetSpecialization and GetSpecializationInfo then
+                local specIndex = GetSpecialization()
+                if specIndex then
+                    local _, name = GetSpecializationInfo(specIndex)
+                    specName = name
+                end
+            end
+            local classLocalized, classFile = UnitClass("player")
+
+            -- Normalize class display: only first letter uppercase
+            local className = classLocalized or ""
+            className = className:lower():gsub("^%l", string.upper)
+
+            -- Build spec + class as plain text first (e.g., "Elemental Shaman" or just "Shaman")
+            local specAndClassPlain
+            if specName and specName ~= "" then
+                specAndClassPlain = string.format("%s %s", specName, className)
+            else
+                specAndClassPlain = className
+            end
+
+            -- Apply class color to the entire "spec + class" string
+            local specAndClassColored = specAndClassPlain
+            if RAID_CLASS_COLORS and classFile and RAID_CLASS_COLORS[classFile] then
+                local c = RAID_CLASS_COLORS[classFile]
+                if c and c.r and c.g and c.b then
+                    specAndClassColored = string.format("|cff%02x%02x%02x%s|r",
+                        math.floor(c.r * 255 + 0.5),
+                        math.floor(c.g * 255 + 0.5),
+                        math.floor(c.b * 255 + 0.5),
+                        specAndClassPlain
+                    )
+                end
+            end
+
+            -- "Level 80" in yellow, followed by spec + class in class color
+            local levelPart = ""
+            if level and level > 0 then
+                levelPart = string.format("|cffffff00Level %d|r ", level)
+            end
+
+            local summaryText = levelPart .. (specAndClassColored or "")
+            CharacterWindowFrameCharacterSummary:SetText(summaryText)
         end
+
+        -- Set the PortraitFrameTemplate title bar text to the character's full title + name in white
+        local baseName  = UnitName("player") or ""
+        local titleName = UnitPVPName and UnitPVPName("player") or baseName -- includes chosen title if any
+        titleName       = titleName or baseName
+
+        if CharacterWindowFrame.SetTitle then
+            CharacterWindowFrame:SetTitle(titleName)
+        end
+
+        -- Different PortraitFrameTemplate variants store TitleText in different places; try them all.
+        local titleFS = CharacterWindowFrame.TitleText
+        if not titleFS and CharacterWindowFrame.TitleContainer and CharacterWindowFrame.TitleContainer.TitleText then
+            titleFS = CharacterWindowFrame.TitleContainer.TitleText
+        end
+        if not titleFS and CharacterWindowFrame.GetName then
+            local frameName = CharacterWindowFrame:GetName()
+            if frameName then
+                titleFS = _G[frameName .. "TitleText"]
+            end
+        end
+
+        if titleFS then
+            titleFS:SetText(titleName)
+            if titleFS.SetTextColor then
+                -- Force pure white text for both title and name
+                titleFS:SetTextColor(1, 1, 1)
+            end
+            titleFS:Show()
+        end
+
         -- Populate equipment slot icons and stats
         CharacterWindow_UpdateEquipmentSlots()
         CharacterWindow_UpdateStatsPanel()

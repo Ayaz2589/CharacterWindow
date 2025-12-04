@@ -18,6 +18,14 @@
         <Texture name="$parentZoneBG" setAllPoints="true"/>
       </Layer>
 
+      <!-- Character summary centered near the top of the main frame -->
+      <Layer level="ARTWORK">
+        <FontString name="$parentCharacterSummary" inherits="GameFontHighlightLarge" justifyH="CENTER">
+          <Anchors>
+            <Anchor point="TOP" relativePoint="TOP" x="0" y="-40"/>
+          </Anchors>
+        </FontString>
+      </Layer>
     </Layers>
 
     <!-- Model and gear slots -->

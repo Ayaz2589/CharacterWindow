@@ -188,6 +188,51 @@
           </Anchors>
           <FontHeight val="20"/>
         </FontString>
+
+        <!-- Row 4: versatility -->
+        <FontString name="$parentEnhancementsLine4Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine3Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine4Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine4Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+
+        <!-- Row 5: leech -->
+        <FontString name="$parentEnhancementsLine5Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine4Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine5Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine5Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+
+        <!-- Row 6: speed -->
+        <FontString name="$parentEnhancementsLine6Label" inherits="GameFontHighlightSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentEnhancementsLine5Label" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
+        <FontString name="$parentEnhancementsLine6Value" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+          <Anchors>
+            <Anchor point="TOP"   relativeTo="$parentEnhancementsLine6Label" relativePoint="TOP"   x="0"  y="0"/>
+            <Anchor point="RIGHT" relativeTo="$parent"                        relativePoint="RIGHT" x="-24" y="0"/>
+          </Anchors>
+          <FontHeight val="20"/>
+        </FontString>
       </Layer>
     </Layers>
 
