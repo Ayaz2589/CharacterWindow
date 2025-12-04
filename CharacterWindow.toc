@@ -4,10 +4,10 @@
 ## Version: 1.0.0
 ## Notes: Custom character paperdoll window with model, gear slots, and spec icon.
 
-UI.xml
-Model.lua
-Equipment.lua
-Stats.lua
-Core.lua
+UI/UI.xml
+Modules/Character.lua
+Modules/Equipment.lua
+Modules/Stats.lua
+Modules/Core.lua
 
 

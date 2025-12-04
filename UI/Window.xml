@@ -1,0 +1,54 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Main window frame (parent) -->
+  <Frame name="CharacterWindowFrame" parent="UIParent" hidden="true" movable="true" enableMouse="true"
+         clampedToScreen="true" inherits="PortraitFrameTemplate" frameStrata="HIGH">
+    <!-- Size will be set in Lua to 70% width / 50% height of the screen -->
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+
+    <!-- Background (inside the portrait frame border) -->
+    <Layers>
+      <Layer level="BACKGROUND">
+        <!-- Dark overlay covering the full window interior -->
+        <Texture name="$parentBG" setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.7"/>
+        </Texture>
+        <!-- Race/class-specific starting zone background, updated from Lua -->
+        <Texture name="$parentZoneBG" setAllPoints="true"/>
+      </Layer>
+
+      <!-- Character summary centered near the top of the main frame -->
+      <Layer level="ARTWORK">
+        <FontString name="$parentCharacterSummary" inherits="GameFontHighlightLarge" justifyH="CENTER">
+          <Anchors>
+            <Anchor point="TOP" relativePoint="TOP" x="0" y="-40"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+    <!-- Drag + events -->
+    <Scripts>
+      <OnLoad>
+        print("CharacterWindowFrame loaded.")
+      </OnLoad>
+      <OnHide>
+        -- Hide tabs when window is hidden (via X button or slash command)
+        if CharacterWindowFrameTab1 then CharacterWindowFrameTab1:Hide() end
+        if CharacterWindowFrameTab2 then CharacterWindowFrameTab2:Hide() end
+        if CharacterWindowFrameTab3 then CharacterWindowFrameTab3:Hide() end
+      </OnHide>
+      <OnMouseDown>
+        self:StartMoving()
+      </OnMouseDown>
+      <OnMouseUp>
+        self:StopMovingOrSizing()
+      </OnMouseUp>
+    </Scripts>
+
+  </Frame>
+
+</Ui>
+

@@ -236,8 +236,210 @@
       </Layer>
     </Layers>
 
+    <!-- Interactive tooltip frames for stats -->
+    <Frames>
+      <!-- Item Level tooltip -->
+      <Frame name="$parentItemLevelTooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelItemLevelBounce" relativePoint="TOPLEFT" x="-10" y="5"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelItemLevelBounce" relativePoint="BOTTOMRIGHT" x="10" y="-5"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "itemlevel")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Primary stat tooltip -->
+      <Frame name="$parentAttributesLine1Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelAttributesLine1Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelAttributesLine1Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "primary")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Stamina tooltip -->
+      <Frame name="$parentAttributesLine2Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelAttributesLine2Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelAttributesLine2Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "stamina")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Armor tooltip -->
+      <Frame name="$parentAttributesLine3Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelAttributesLine3Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelAttributesLine3Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "armor")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Critical Strike tooltip -->
+      <Frame name="$parentEnhancementsLine1Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine1Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine1Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "crit")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Haste tooltip -->
+      <Frame name="$parentEnhancementsLine2Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine2Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine2Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "haste")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Mastery tooltip -->
+      <Frame name="$parentEnhancementsLine3Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine3Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine3Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "mastery")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Versatility tooltip -->
+      <Frame name="$parentEnhancementsLine4Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine4Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine4Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "versatility")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Leech tooltip -->
+      <Frame name="$parentEnhancementsLine5Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine5Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine5Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "leech")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+      
+      <!-- Speed tooltip -->
+      <Frame name="$parentEnhancementsLine6Tooltip" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="CharacterWindowStatsPanelEnhancementsLine6Label" relativePoint="TOPLEFT" x="-5" y="2"/>
+          <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowStatsPanelEnhancementsLine6Value" relativePoint="BOTTOMRIGHT" x="5" y="-2"/>
+        </Anchors>
+        <Scripts>
+          <OnEnter>
+            if CharacterWindow_ShowStatTooltip then
+              CharacterWindow_ShowStatTooltip(self, "speed")
+            end
+          </OnEnter>
+          <OnLeave>
+            if CharacterWindow_HideStatTooltip then
+              CharacterWindow_HideStatTooltip()
+            end
+          </OnLeave>
+        </Scripts>
+      </Frame>
+    </Frames>
+
   </Frame>
 
 </Ui>
-
 

@@ -1,0 +1,206 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Simple item slot template used around the character model -->
+  <Button name="CharacterWindowItemSlotTemplate" virtual="true" registerForDrag="LeftButton">
+    <Size x="56" y="56"/>
+    <Layers>
+      <Layer level="BORDER">
+        <!-- Use the standard quickslot border which fills the button area -->
+        <Texture name="$parentBorder" setAllPoints="true" file="Interface\Buttons\UI-Quickslot"/>
+      </Layer>
+      <Layer level="ARTWORK">
+        <!-- Icon texture where we will draw the equipped item -->
+        <Texture name="$parentIcon" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnEnter>
+        if CharacterWindow_EquipSlot_OnEnter then
+          CharacterWindow_EquipSlot_OnEnter(self)
+        end
+      </OnEnter>
+      <OnLeave>
+        if CharacterWindow_EquipSlot_OnLeave then
+          CharacterWindow_EquipSlot_OnLeave(self)
+        end
+      </OnLeave>
+      <OnClick>
+        if CharacterWindow_EquipSlot_OnClick then
+          CharacterWindow_EquipSlot_OnClick(self, button)
+        end
+      </OnClick>
+      <OnDragStart>
+        if CharacterWindow_EquipSlot_OnDragStart then
+          CharacterWindow_EquipSlot_OnDragStart(self)
+        end
+      </OnDragStart>
+      <OnReceiveDrag>
+        if CharacterWindow_EquipSlot_OnReceiveDrag then
+          CharacterWindow_EquipSlot_OnReceiveDrag(self)
+        end
+      </OnReceiveDrag>
+      <OnDragStop>
+        if CharacterWindow_EquipSlot_OnDragStop then
+          CharacterWindow_EquipSlot_OnDragStop(self)
+        end
+      </OnDragStop>
+    </Scripts>
+  </Button>
+
+  <!-- Character model and equipment slots (left side) -->
+  <!-- Character model: fixed area on the left -->
+  <PlayerModel name="CharacterWindowFrameModel" parent="CharacterWindowFrame">
+      <!-- Height scales automatically with the window via top/bottom anchors.
+           Adjust padding so the model sits closer to the weapon slots. -->
+      <Anchors>
+        <!-- Slightly shifted right so left slots stay inside the frame on wide screens -->
+        <Anchor point="TOPLEFT"    x="100"  y="-60"/>
+        <Anchor point="BOTTOMLEFT" x="100"  y="40"/>
+      </Anchors>
+      <Scripts>
+        <OnLoad>
+          self:SetUnit("player")
+          self:SetPortraitZoom(0.025)
+          self.rotation = 0
+          self.isRotating = false
+        </OnLoad>
+        <OnMouseDown>
+          if button == "LeftButton" then
+            self.isRotating = true
+            local x = GetCursorPosition()
+            local scale = UIParent:GetEffectiveScale()
+            self.lastX = x / scale
+          end
+        </OnMouseDown>
+        <OnMouseUp>
+          if button == "LeftButton" then
+            self.isRotating = false
+          end
+        </OnMouseUp>
+        <OnUpdate>
+          if self.isRotating then
+            local x = GetCursorPosition()
+            local scale = UIParent:GetEffectiveScale()
+            local currentX = x / scale
+            
+            if self.lastX then
+              local deltaX = currentX - self.lastX
+              self.rotation = self.rotation + (deltaX * 0.01)
+              if self.rotation &lt; 0 then
+                self.rotation = self.rotation + (2 * math.pi)
+              elseif self.rotation &gt; (2 * math.pi) then
+                self.rotation = self.rotation - (2 * math.pi)
+              end
+              self:SetRotation(self.rotation)
+            end
+            
+            self.lastX = currentX
+          end
+        </OnUpdate>
+      </Scripts>
+    </PlayerModel>
+
+  <!-- Simple equipment slot buttons around the model -->
+  <!-- Left side slots (stacked from top to bottom beside the model) -->
+  <Button name="CharacterWindowFrameLeftSlot1" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="CharacterWindowFrameModel" relativePoint="TOPLEFT" x="-12" y="-90"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot2" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot1" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot3" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot2" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot4" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot3" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+
+  <!-- Extra left-side slots for Shirt, Tabard, Wrist -->
+  <Button name="CharacterWindowFrameLeftSlot5" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot4" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot6" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot5" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot7" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot6" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameLeftSlot8" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPRIGHT" relativeTo="$parentLeftSlot7" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+
+  <!-- Right side slots (stacked from top to bottom beside the model) -->
+  <Button name="CharacterWindowFrameRightSlot1" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="CharacterWindowFrameModel" relativePoint="TOPRIGHT" x="12" y="-80"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot2" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot1" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot3" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot2" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot4" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot3" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+
+  <!-- Extra right-side slots for Rings and Trinkets -->
+  <Button name="CharacterWindowFrameRightSlot5" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot4" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot6" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot5" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot7" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot6" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameRightSlot8" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentRightSlot7" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+      </Anchors>
+    </Button>
+
+  <!-- Weapon slots under the model: main hand and off hand -->
+  <Button name="CharacterWindowFrameBottomSlotMainHand" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <!-- Anchor from the bottom of the model; smaller X offset so weapon slots sit closer together -->
+        <Anchor point="BOTTOMRIGHT" relativeTo="CharacterWindowFrameModel" relativePoint="BOTTOM" x="-6" y="10"/>
+      </Anchors>
+    </Button>
+    <Button name="CharacterWindowFrameBottomSlotOffHand" parent="CharacterWindowFrame" inherits="CharacterWindowItemSlotTemplate">
+      <Anchors>
+        <Anchor point="BOTTOMLEFT" relativeTo="CharacterWindowFrameModel" relativePoint="BOTTOM" x="6" y="10"/>
+      </Anchors>
+    </Button>
+
+</Ui>
+

@@ -1,0 +1,206 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Three tabs below the window (outside the frame) -->
+  <Button name="CharacterWindowFrameTab1" parent="UIParent" hidden="true">
+    <Size x="100" y="32"/>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="CharacterWindowFrame" relativePoint="BOTTOMLEFT" x="20" y="0"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <!-- Left edge texture for active tab -->
+        <Texture name="$parentLeft" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="LEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-left", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Right edge texture for active tab -->
+        <Texture name="$parentRight" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="RIGHT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-right", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Center texture for active tab -->
+        <Texture name="$parentCenter" hidden="true">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentLeft" relativePoint="TOPRIGHT" x="0" y="0"/>
+            <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("_uiframe-activetab-center", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString name="$parentText" inherits="GameFontNormal" text="Character">
+          <Anchors>
+            <Anchor point="CENTER" x="0" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        if CharacterWindow_SwitchTab then
+          CharacterWindow_SwitchTab(1)
+        end
+      </OnClick>
+    </Scripts>
+  </Button>
+
+  <Button name="CharacterWindowFrameTab2" parent="UIParent" hidden="true">
+    <Size x="100" y="32"/>
+    <Anchors>
+      <Anchor point="LEFT" relativeTo="CharacterWindowFrameTab1" relativePoint="RIGHT" x="5" y="0"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <!-- Left edge texture for active tab -->
+        <Texture name="$parentLeft" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="LEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-left", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Right edge texture for active tab -->
+        <Texture name="$parentRight" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="RIGHT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-right", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Center texture for active tab -->
+        <Texture name="$parentCenter" hidden="true">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentLeft" relativePoint="TOPRIGHT" x="0" y="0"/>
+            <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("_uiframe-activetab-center", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString name="$parentText" inherits="GameFontNormal" text="Reputation">
+          <Anchors>
+            <Anchor point="CENTER" x="0" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        if CharacterWindow_SwitchTab then
+          CharacterWindow_SwitchTab(2)
+        end
+      </OnClick>
+    </Scripts>
+  </Button>
+
+  <Button name="CharacterWindowFrameTab3" parent="UIParent" hidden="true">
+    <Size x="100" y="32"/>
+    <Anchors>
+      <Anchor point="LEFT" relativeTo="CharacterWindowFrameTab2" relativePoint="RIGHT" x="5" y="0"/>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <!-- Left edge texture for active tab -->
+        <Texture name="$parentLeft" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="LEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-left", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Right edge texture for active tab -->
+        <Texture name="$parentRight" hidden="true">
+          <Size x="16" y="32"/>
+          <Anchors>
+            <Anchor point="RIGHT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("uiframe-activetab-right", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+        <!-- Center texture for active tab -->
+        <Texture name="$parentCenter" hidden="true">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="$parentLeft" relativePoint="TOPRIGHT" x="0" y="0"/>
+            <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+          </Anchors>
+          <Scripts>
+            <OnLoad>
+              if self.SetAtlas then
+                self:SetAtlas("_uiframe-activetab-center", true)
+              end
+            </OnLoad>
+          </Scripts>
+        </Texture>
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString name="$parentText" inherits="GameFontNormal" text="Currency">
+          <Anchors>
+            <Anchor point="CENTER" x="0" y="0"/>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        if CharacterWindow_SwitchTab then
+          CharacterWindow_SwitchTab(3)
+        end
+      </OnClick>
+    </Scripts>
+  </Button>
+
+</Ui>
+

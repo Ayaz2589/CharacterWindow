@@ -1,0 +1,12 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+  <!-- Main window frame (parent) -->
+  <Include file="Window.xml"/>
+  <!-- Character model and equipment slots (left side) -->
+  <Include file="Character.xml"/>
+  <!-- Right-side stats panel -->
+  <Include file="Stats.xml"/>
+  <!-- Tabs at bottom left -->
+  <Include file="Tabs.xml"/>
+
+</Ui>
