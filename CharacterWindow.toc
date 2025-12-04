@@ -5,6 +5,9 @@
 ## Notes: Custom character paperdoll window with model, gear slots, and spec icon.
 
 UI.xml
+Model.lua
+Equipment.lua
+Stats.lua
 Core.lua
 
 
