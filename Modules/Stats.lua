@@ -29,12 +29,12 @@ function CharacterWindow_UpdateStatsPanel()
         return
     end
 
-    -- Class for stats panel background
-    local _, class = UnitClass("player")
-    local atlas    = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
-    if CharacterWindowStatsPanelClassBG and CharacterWindowStatsPanelClassBG.SetAtlas then
-        CharacterWindowStatsPanelClassBG:SetAtlas(atlas, true)
-    end
+    -- Class for stats panel background - removed per user request
+    -- local _, class = UnitClass("player")
+    -- local atlas    = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
+    -- if CharacterWindowStatsPanelClassBG and CharacterWindowStatsPanelClassBG.SetAtlas then
+    --     CharacterWindowStatsPanelClassBG:SetAtlas(atlas, true)
+    -- end
 
     -- Character summary has moved to the main frame; no summary text in the stats panel
 
@@ -44,7 +44,7 @@ function CharacterWindow_UpdateStatsPanel()
     if CharacterWindowStatsPanelItemLevelValue and ilvl then
         CharacterWindowStatsPanelItemLevelValue:SetFormattedText("%.1f", ilvl)
         -- Ensure the item level number is visually large regardless of XML quirks
-        CharacterWindow_SetFontSize(CharacterWindowStatsPanelItemLevelValue, 30)
+        CharacterWindow_SetFontSize(CharacterWindowStatsPanelItemLevelValue, 25)
     end
 
     -- Primary stat, stamina, armor (very simple approximation)
@@ -167,12 +167,12 @@ function CharacterWindow_ShowStatTooltip(self, statType)
     if not GameTooltip then
         return
     end
-    
+
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:ClearLines()
-    
+
     local _, class = UnitClass("player")
-    
+
     if statType == "itemlevel" then
         local avg, equipped = GetAverageItemLevel()
         local ilvl = equipped or avg
@@ -189,10 +189,10 @@ function CharacterWindow_ShowStatTooltip(self, statType)
         elseif class == "PALADIN" or class == "DEATHKNIGHT" then
             primaryLabel = "Strength"
         end
-        
+
         local statIndex = primaryLabel == "Strength" and 1 or (primaryLabel == "Agility" and 2 or 4)
         local primaryBase, primaryEff = UnitStat("player", statIndex)
-        
+
         GameTooltip:SetText(primaryLabel, 1, 1, 1)
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(string.format("Total: %d", primaryEff or primaryBase or 0), 1, 1, 1)
@@ -221,7 +221,8 @@ function CharacterWindow_ShowStatTooltip(self, statType)
             GameTooltip:AddLine(string.format("Base: %d", baseArmor), 0.7, 0.7, 0.7)
             GameTooltip:AddLine(string.format("Bonus: +%d", (effectiveArmor - baseArmor)), 0, 1, 0)
         end
-        local reduction = effectiveArmor and (effectiveArmor / (effectiveArmor + 400 + 85 * UnitLevel("player"))) * 100 or 0
+        local reduction = effectiveArmor and (effectiveArmor / (effectiveArmor + 400 + 85 * UnitLevel("player"))) * 100 or
+            0
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(string.format("Physical Damage Reduction: %.1f%%", reduction), 0, 1, 0)
     elseif statType == "crit" then
@@ -230,7 +231,8 @@ function CharacterWindow_ShowStatTooltip(self, statType)
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(string.format("Chance: %.2f%%", crit), 1, 1, 1)
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Increases chance for spells and attacks to critically hit for 200% damage.", 0.7, 0.7, 0.7, true)
+        GameTooltip:AddLine("Increases chance for spells and attacks to critically hit for 200% damage.", 0.7, 0.7, 0.7,
+            true)
     elseif statType == "haste" then
         local haste = GetHaste and GetHaste() or 0
         GameTooltip:SetText("Haste", 1, 1, 1)
@@ -272,7 +274,7 @@ function CharacterWindow_ShowStatTooltip(self, statType)
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine("Increases movement speed.", 0.7, 0.7, 0.7, true)
     end
-    
+
     GameTooltip:Show()
 end
 
@@ -281,4 +283,3 @@ function CharacterWindow_HideStatTooltip()
         GameTooltip:Hide()
     end
 end
-

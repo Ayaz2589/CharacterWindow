@@ -3,7 +3,7 @@ local addonName, ns = ...
 -- Map player race/class to character creation starting zone atlases
 local RACE_ATLAS_MAP = {
     -- Core races
-    Orc                = "charactercreate-startingzone-orc",
+    Orc                = "charactercreate-startingzone-magharorc",
     Troll              = "charactercreate-startingzone-troll",
     Tauren             = "charactercreate-startingzone-tauren",
     Scourge            = "charactercreate-startingzone-undead",
@@ -112,8 +112,17 @@ function CharacterWindowFrame_UpdateSize()
         return
     end
 
-    local frameW = screenW * 0.7
-    local frameH = screenH * 0.8
+    -- Calculate percentage-based size
+    local frameW = screenW * 0.7  -- 70% width
+    local frameH = screenH * 0.75 -- 75% height (increased for smaller screens)
+
+    -- Maximum size constraints (to prevent window from being too large on ultra-wide monitors)
+    local maxWidth = 1200  -- Maximum width in pixels (reduced for ultra-wide)
+    local maxHeight = 1200 -- Maximum height in pixels
+
+    -- Apply maximum constraints
+    frameW = math.min(frameW, maxWidth)
+    frameH = math.min(frameH, maxHeight)
 
     -- Resize the window itself
     CharacterWindowFrame:SetSize(frameW, frameH)

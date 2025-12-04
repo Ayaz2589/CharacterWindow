@@ -11,8 +11,8 @@
 
     <Layers>
       <Layer level="BACKGROUND">
-        <!-- Class-themed stats background atlas (set from Lua) -->
-        <Texture name="$parentClassBG" setAllPoints="true"/>
+        <!-- Class-themed stats background atlas (removed per user request) -->
+        <Texture name="$parentClassBG" setAllPoints="true" hidden="true"/>
 
         <!-- Dark overlay inset so it sits inside the TooltipBorderedFrameTemplate border -->
         <Texture name="$parentBG">
@@ -20,7 +20,7 @@
             <Anchor point="TOPLEFT" x="4" y="-4"/>
             <Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
           </Anchors>
-          <Color r="0" g="0" b="0" a="0.75"/>
+          <Color r="0" g="0" b="0" a="0.35"/>
         </Texture>
       </Layer>
 

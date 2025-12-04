@@ -13,7 +13,7 @@
       <Layer level="BACKGROUND">
         <!-- Dark overlay covering the full window interior -->
         <Texture name="$parentBG" setAllPoints="true">
-          <Color r="0" g="0" b="0" a="0.7"/>
+          <Color r="0" g="0" b="0" a="0.01"/>
         </Texture>
         <!-- Race/class-specific starting zone background, updated from Lua -->
         <Texture name="$parentZoneBG" setAllPoints="true"/>
