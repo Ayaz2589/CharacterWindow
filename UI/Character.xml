@@ -71,8 +71,8 @@
            Adjust padding so the model sits closer to the weapon slots. -->
       <Anchors>
         <!-- Shifted further right to create more space between model and equipment slots -->
-        <Anchor point="TOPLEFT"    x="150"  y="-60"/>
-        <Anchor point="BOTTOMLEFT" x="150"  y="40"/>
+        <Anchor point="TOPLEFT"    x="100"  y="-60"/>
+        <Anchor point="BOTTOMLEFT" x="100"  y="40"/>
       </Anchors>
       <Scripts>
         <OnLoad>
