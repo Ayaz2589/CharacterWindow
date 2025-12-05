@@ -1,63 +1,34 @@
 local addonName, ns = ...
 
--- Map player race/class to character creation starting zone atlases
-local RACE_ATLAS_MAP = {
-    -- Core races
-    Orc                = "charactercreate-startingzone-magharorc",
-    Troll              = "charactercreate-startingzone-troll",
-    Tauren             = "charactercreate-startingzone-tauren",
-    Scourge            = "charactercreate-startingzone-undead",
-    Undead             = "charactercreate-startingzone-undead",
-    NightElf           = "charactercreate-startingzone-nightelf",
-    Draenei            = "charactercreate-startingzone-draenei",
-    Dwarf              = "charactercreate-startingzone-dwarf",
-    Gnome              = "charactercreate-startingzone-gnome",
-    Goblin             = "charactercreate-startingzone-goblin",
-    Worgen             = "charactercreate-startingzone-worgen",
-    BloodElf           = "charactercreate-startingzone-bloodelf",
-    Pandaren           = "charactercreate-startingzone-pandaren",
-
-    -- Allied / newer races
-    LightforgedDraenei = "charactercreate-startingzone-lightforgeddraenei",
-    MagharOrc          = "charactercreate-startingzone-magharorc",
-    Mechagnome         = "charactercreate-startingzone-mechagnome",
-    Nightborne         = "charactercreate-startingzone-nightborne",
-    HighmountainTauren = "charactercreate-startingzone-highmountaintauren",
-    VoidElf            = "charactercreate-startingzone-voidelf",
-    Vulpera            = "charactercreate-startingzone-vulpera",
-    ZandalariTroll     = "charactercreate-startingzone-zandalaritroll",
-    DarkIronDwarf      = "charactercreate-startingzone-darkirondwarf",
-    KulTiran           = "charactercreate-startingzone-kultiran",
-    Earthen            = "charactercreate-startingzone-earthen",
+-- Map player class to Legion mission complete background atlases
+local CLASS_ATLAS_MAP = {
+    DEATHKNIGHT = "legionmission-complete-background-deathknight",
+    DEMONHUNTER = "legionmission-complete-background-demonhunter",
+    DRUID       = "legionmission-complete-background-druid",
+    HUNTER      = "legionmission-complete-background-hunter",
+    MAGE        = "legionmission-complete-background-mage",
+    MONK        = "legionmission-complete-background-monk",
+    PALADIN     = "legionmission-complete-background-paladin",
+    PRIEST      = "legionmission-complete-background-priest",
+    ROGUE       = "legionmission-complete-background-rogue",
+    SHAMAN      = "legionmission-complete-background-shaman",
+    WARLOCK     = "legionmission-complete-background-warlock",
+    WARRIOR     = "legionmission-complete-background-warrior",
 }
 
--- Choose a background atlas based on race/class
+-- Choose a background atlas based on class
 function CharacterWindow_UpdateBackground()
     if not CharacterWindowFrameZoneBG then
         return
     end
 
-    local _, raceFile = UnitRace("player")
     local _, classFile = UnitClass("player")
 
-    local atlas
+    local atlas = CLASS_ATLAS_MAP[classFile]
 
-    -- Class-based overrides
-    if classFile == "DEMONHUNTER" then
-        atlas = "charactercreate-startingzone-demonhunter"
-    elseif classFile == "DEATHKNIGHT" and raceFile and not RACE_ATLAS_MAP[raceFile] then
-        -- Allied race death knights share a common background
-        atlas = "charactercreate-startingzone-deathknight-alliedraces"
-    end
-
-    -- Race-based fallback
-    if not atlas and raceFile and RACE_ATLAS_MAP[raceFile] then
-        atlas = RACE_ATLAS_MAP[raceFile]
-    end
-
-    -- Final fallback if we don't have a specific mapping
+    -- Fallback if class not found
     if not atlas then
-        atlas = "charactercreate-startingzone-orc"
+        atlas = "legionmission-complete-background-warrior"
     end
 
     if CharacterWindowFrameZoneBG.SetAtlas then
@@ -66,11 +37,11 @@ function CharacterWindow_UpdateBackground()
         CharacterWindowFrameZoneBG:SetTexture("Interface\\Glues\\CharacterCreate\\" .. atlas)
     end
 
-    -- Make the background black & white and slightly darker
+    -- Slightly dull the background so it doesn't overpower character details
     if CharacterWindowFrameZoneBG.SetDesaturated then
-        CharacterWindowFrameZoneBG:SetDesaturated(true)
+        CharacterWindowFrameZoneBG:SetDesaturated(false)        -- Keep color but reduce intensity
     end
-    CharacterWindowFrameZoneBG:SetVertexColor(0.5, 0.5, 0.5)
+    CharacterWindowFrameZoneBG:SetVertexColor(0.75, 0.75, 0.75) -- Slightly darker
 end
 
 -- Refresh the player model to reflect current appearance / equipment

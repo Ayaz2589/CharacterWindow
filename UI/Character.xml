@@ -5,12 +5,21 @@
     <Size x="56" y="56"/>
     <Layers>
       <Layer level="BORDER">
-        <!-- Use the standard quickslot border which fills the button area -->
+        <!-- Use the standard quickslot border which fills the button area (shown when slot is empty) -->
         <Texture name="$parentBorder" setAllPoints="true" file="Interface\Buttons\UI-Quickslot"/>
       </Layer>
       <Layer level="ARTWORK">
         <!-- Icon texture where we will draw the equipped item -->
         <Texture name="$parentIcon" setAllPoints="true"/>
+      </Layer>
+      <Layer level="OVERLAY">
+        <!-- Rarity border (shown when item is equipped, on top of icon) -->
+        <Texture name="$parentRarityBorder" hidden="true">
+          <Size x="60" y="60"/>
+          <Anchors>
+            <Anchor point="CENTER" x="0" y="0"/>
+          </Anchors>
+        </Texture>
       </Layer>
     </Layers>
     <Scripts>

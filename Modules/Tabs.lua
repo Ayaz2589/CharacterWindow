@@ -51,10 +51,7 @@ function CharacterWindow_SwitchTab(tabIndex)
     if CharacterWindowFrameTab3 then CharacterWindowFrameTab3:Show() end
   elseif tabIndex == 2 then
     -- Reputation tab - close our window and open WoW's Reputation frame
-    local savedLeft, savedTop
     if CharacterWindowFrame then
-      savedLeft = CharacterWindowFrame:GetLeft()
-      savedTop = CharacterWindowFrame:GetTop()
       CharacterWindowFrame:Hide()
     end
 
@@ -65,22 +62,10 @@ function CharacterWindow_SwitchTab(tabIndex)
 
     if ToggleCharacter then
       ToggleCharacter("ReputationFrame")
-      -- Set position after frame is shown
-      if savedLeft and savedTop and CharacterFrame then
-        C_Timer.After(0.1, function()
-          if CharacterFrame then
-            CharacterFrame:ClearAllPoints()
-            CharacterFrame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", savedLeft, savedTop)
-          end
-        end)
-      end
     end
   elseif tabIndex == 3 then
     -- Currency tab - close our window and open WoW's Currency frame
-    local savedLeft, savedTop
     if CharacterWindowFrame then
-      savedLeft = CharacterWindowFrame:GetLeft()
-      savedTop = CharacterWindowFrame:GetTop()
       CharacterWindowFrame:Hide()
     end
 
@@ -91,15 +76,6 @@ function CharacterWindow_SwitchTab(tabIndex)
 
     if ToggleCharacter then
       ToggleCharacter("TokenFrame")
-      -- Set position after frame is shown
-      if savedLeft and savedTop and CharacterFrame then
-        C_Timer.After(0.1, function()
-          if CharacterFrame then
-            CharacterFrame:ClearAllPoints()
-            CharacterFrame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", savedLeft, savedTop)
-          end
-        end)
-      end
     end
   end
 end

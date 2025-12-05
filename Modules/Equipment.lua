@@ -1,5 +1,36 @@
 local addonName, ns = ...
 
+-- Mapping of inventory slots to transmog navigation icons for empty slots
+local TRANSMOG_ICONS = {
+    HeadSlot = "transmog-nav-slot-head",
+    NeckSlot = nil, -- No transmog icon for neck
+    ShoulderSlot = "transmog-nav-slot-shoulder",
+    ChestSlot = "transmog-nav-slot-chest",
+    BackSlot = "transmog-nav-slot-back",
+    ShirtSlot = "transmog-nav-slot-shirt",
+    TabardSlot = "transmog-nav-slot-tabard",
+    WristSlot = "transmog-nav-slot-wrist",
+    HandsSlot = "transmog-nav-slot-hands",
+    WaistSlot = "transmog-nav-slot-waist",
+    LegsSlot = "transmog-nav-slot-legs",
+    FeetSlot = "transmog-nav-slot-feet",
+    MainHandSlot = "transmog-nav-slot-mainhand",
+    SecondaryHandSlot = "transmog-nav-slot-secondaryhand",
+}
+
+-- Mapping of item quality to rarity border atlas
+local RARITY_BORDERS = {
+    [0] = "wowlabs-in-world-item-common",    -- Poor
+    [1] = "wowlabs-in-world-item-common",    -- Common
+    [2] = "wowlabs-in-world-item-uncommon",  -- Uncommon
+    [3] = "wowlabs-in-world-item-rare",      -- Rare
+    [4] = "wowlabs-in-world-item-epic",      -- Epic
+    [5] = "wowlabs-in-world-item-legendary", -- Legendary
+    [6] = "wowlabs-in-world-item-legendary", -- Artifact
+    [7] = "wowlabs-in-world-item-legendary", -- Heirloom
+    [8] = "wowlabs-in-world-item-epic",      -- WoW Token
+}
+
 -- Equipment slot configuration: which frame maps to which inventory slot
 EQUIPMENT_SLOTS = {
     -- Left side: core armor + back/shirt/tabard/wrist
@@ -70,18 +101,63 @@ function CharacterWindow_UpdateEquipmentSlots()
         local button = _G[slot.frameName]
         if button then
             local icon = button.Icon or _G[slot.frameName .. "Icon"]
+            local border = button.Border or _G[slot.frameName .. "Border"]
+            local rarityBorder = button.RarityBorder or _G[slot.frameName .. "RarityBorder"]
+
             if icon then
                 local invSlotId = GetInventorySlotInfo(slot.invToken)
                 local texture = GetInventoryItemTexture("player", invSlotId)
                 -- Store info on the button so tooltip handlers can use it
                 button.invSlotId = invSlotId
                 button.invUnit = "player"
+
                 -- Always show a full-size icon so empty and filled slots look the same size.
-                -- Use the real item icon when present, otherwise fall back to a generic empty-slot texture.
+                -- Use the real item icon when present, otherwise use transmog icon or fall back to generic empty-slot texture.
                 if not texture then
-                    texture = "Interface\\PaperDoll\\UI-Backpack-EmptySlot"
+                    -- Empty slot - show transmog icon or generic empty slot, hide rarity border
+                    local transmogAtlas = TRANSMOG_ICONS[slot.invToken]
+                    if transmogAtlas and icon.SetAtlas then
+                        icon:SetAtlas(transmogAtlas, true)
+                    else
+                        icon:SetTexture("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
+                    end
+                    -- Hide rarity border, show default border
+                    if rarityBorder then
+                        rarityBorder:Hide()
+                    end
+                    if border then
+                        border:Show()
+                    end
+                else
+                    -- Item is equipped, use normal texture (clear any atlas that might be set)
+                    if icon.SetAtlas then
+                        icon:SetAtlas(nil)
+                    end
+                    icon:SetTexture(texture)
+
+                    -- Get item quality and show appropriate rarity border
+                    local itemLink = GetInventoryItemLink("player", invSlotId)
+                    local quality = 0
+                    if itemLink then
+                        quality = select(3, GetItemInfo(itemLink)) or 0
+                    end
+
+                    local rarityAtlas = RARITY_BORDERS[quality] or RARITY_BORDERS[0]
+                    if rarityBorder then
+                        if rarityAtlas then
+                            if rarityBorder.SetAtlas then
+                                rarityBorder:SetAtlas(rarityAtlas, true)
+                                rarityBorder:Show()
+                            end
+                        else
+                            rarityBorder:Hide()
+                        end
+                    end
+                    -- Hide default border when rarity border is shown
+                    if border then
+                        border:Hide()
+                    end
                 end
-                icon:SetTexture(texture)
                 icon:Show()
             end
         end
@@ -181,4 +257,3 @@ eqFrame:SetScript("OnEvent", function(_, event, arg1)
         end
     end
 end)
-
