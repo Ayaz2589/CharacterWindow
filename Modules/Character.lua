@@ -72,7 +72,7 @@ function CharacterWindow_RefreshModel()
     end
 end
 
--- Helper: size window to 60% width / 75% height of the screen, and position model/equipment slots
+-- Helper: size window to 70% width / 80% height of the screen, and position model/equipment slots
 function CharacterWindowFrame_UpdateSize()
     if not CharacterWindowFrame or not UIParent then
         return
@@ -84,7 +84,7 @@ function CharacterWindowFrame_UpdateSize()
     end
 
     -- Calculate percentage-based size
-    local frameW = screenW * 0.65 -- 60% width
+    local frameW = screenW * 0.65 -- 65% width
     local frameH = screenH * 0.75 -- 75% height (increased for smaller screens)
 
     -- Maximum size constraints (to prevent window from being too large on ultra-wide monitors)
