@@ -29,6 +29,9 @@ function CharacterWindow_UpdateStatsPanel()
         return
     end
 
+    -- Initialize the three empty slots above the stats panel
+    CharacterWindow_InitStatsPanelSlots()
+
     -- Class for stats panel background - removed per user request
     -- local _, class = UnitClass("player")
     -- local atlas    = CLASS_STATS_BG_ATLAS[class] or "UI-Character-Info-Mage-BG"
@@ -297,5 +300,72 @@ end
 function CharacterWindow_HideStatTooltip()
     if GameTooltip then
         GameTooltip:Hide()
+    end
+end
+
+-- Mapping of class file names to class icon atlases
+local CLASS_ICON_MAP = {
+    DEATHKNIGHT = "classicon-deathknight",
+    DEMONHUNTER = "classicon-demonhunter",
+    DRUID = "classicon-druid",
+    EVOKER = "classicon-evoker",
+    HUNTER = "classicon-hunter",
+    MAGE = "classicon-mage",
+    MONK = "classicon-monk",
+    PALADIN = "classicon-paladin",
+    PRIEST = "classicon-priest",
+    ROGUE = "classicon-rogue",
+    SHAMAN = "classicon-shaman",
+    WARLOCK = "classicon-warlock",
+    WARRIOR = "classicon-warrior",
+}
+
+-- Initialize the three empty slots above the stats panel
+function CharacterWindow_InitStatsPanelSlots()
+    -- Leftmost slot: class icon (square, fitted inside slot frame)
+    local slot1Frame = _G["CharacterWindowStatsPanelSlotsSlot1Frame"]
+    local slot1 = _G["CharacterWindowStatsPanelSlotsSlot1"]
+
+    -- Set the frame background
+    if slot1Frame then
+        if slot1Frame.SetAtlas then
+            slot1Frame:SetAtlas("UI-HUD-ActionBar-IconFrame", false) -- Don't use atlas size
+            -- Explicitly set size to match XML
+            slot1Frame:SetSize(45, 45)
+        end
+        slot1Frame:Show()
+    end
+
+    -- Set the class icon inside the frame
+    if slot1 then
+        -- Get player's class
+        local _, classFile = UnitClass("player")
+        local classIconAtlas = CLASS_ICON_MAP[classFile] or "classicon-warrior" -- Fallback to warrior
+
+        -- Clear any existing texture
+        if slot1.SetTexture then
+            slot1:SetTexture(nil)
+        end
+        -- Clear any existing texcoord
+        slot1:SetTexCoord(0, 1, 0, 1)
+
+        -- Set class icon atlas
+        if slot1.SetAtlas then
+            slot1:SetAtlas(classIconAtlas, false) -- Don't use atlas size
+            -- Explicitly set size to match XML (smaller than frame)
+            slot1:SetSize(40, 40)
+        end
+        slot1:Show()
+    end
+
+    -- Middle and right slots: empty frame
+    for i = 2, 3 do
+        local slot = _G["CharacterWindowStatsPanelSlotsSlot" .. i]
+        if slot then
+            if slot.SetAtlas then
+                slot:SetAtlas("UI-HUD-ActionBar-IconFrame", true)
+            end
+            slot:Show()
+        end
     end
 end

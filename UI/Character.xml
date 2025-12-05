@@ -22,11 +22,11 @@
         </Texture>
         <!-- Enchant indicator (shown when item has an enchant) - positioned to the right of slot -->
         <Texture name="$parentEnchantIndicator" hidden="true">
-          <Size x="16" y="16"/>
+          <Size x="5" y="5"/>
         </Texture>
         <!-- Gem indicator (shown when item has gems) - positioned to the right of enchant indicator -->
         <Texture name="$parentGemIndicator" hidden="true">
-          <Size x="16" y="16"/>
+          <Size x="5" y="5"/>
         </Texture>
       </Layer>
     </Layers>

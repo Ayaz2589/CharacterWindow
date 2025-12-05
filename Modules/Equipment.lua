@@ -31,6 +31,28 @@ local RARITY_BORDERS = {
     [8] = "wowlabs-in-world-item-epic",      -- WoW Token
 }
 
+-- Mapping of inventory tokens to display names for tooltips
+local SLOT_DISPLAY_NAMES = {
+    HeadSlot = "Head",
+    NeckSlot = "Neck",
+    ShoulderSlot = "Shoulder",
+    ChestSlot = "Chest",
+    BackSlot = "Back",
+    ShirtSlot = "Shirt",
+    TabardSlot = "Tabard",
+    WristSlot = "Wrist",
+    HandsSlot = "Hands",
+    WaistSlot = "Waist",
+    LegsSlot = "Legs",
+    FeetSlot = "Feet",
+    Finger0Slot = "Ring",
+    Finger1Slot = "Ring",
+    Trinket0Slot = "Trinket",
+    Trinket1Slot = "Trinket",
+    MainHandSlot = "Main Hand",
+    SecondaryHandSlot = "Off Hand",
+}
+
 -- Equipment slot configuration: which frame maps to which inventory slot
 EQUIPMENT_SLOTS = {
     -- Left side: core armor + back/shirt/tabard/wrist
@@ -129,28 +151,35 @@ function CharacterWindow_UpdateEquipmentSlots()
             local enchantIndicator = button.EnchantIndicator or _G[slot.frameName .. "EnchantIndicator"]
 
             if icon then
-                local invSlotId = GetInventorySlotInfo(slot.invToken)
+                local invSlotId, invSlotName = GetInventorySlotInfo(slot.invToken)
                 local texture = GetInventoryItemTexture("player", invSlotId)
                 -- Store info on the button so tooltip handlers can use it
                 button.invSlotId = invSlotId
                 button.invUnit = "player"
+                button.invToken = slot.invToken
+                -- Use display name mapping if available, otherwise fall back to slot name
+                button.invSlotName = SLOT_DISPLAY_NAMES[slot.invToken] or invSlotName
+                button.isEmpty = not texture
 
                 -- Always show a full-size icon so empty and filled slots look the same size.
-                -- Use the real item icon when present, otherwise use transmog icon or fall back to generic empty-slot texture.
+                -- Use the real item icon when present, otherwise use empty slot atlas.
                 if not texture then
-                    -- Empty slot - show transmog icon or generic empty slot, hide rarity border and indicators
-                    local transmogAtlas = TRANSMOG_ICONS[slot.invToken]
-                    if transmogAtlas and icon.SetAtlas then
-                        icon:SetAtlas(transmogAtlas, true)
+                    -- Empty slot - show empty slot atlas with common border, hide indicators
+                    if icon.SetAtlas then
+                        icon:SetAtlas("bags-item-bankslot64", true)
                     else
                         icon:SetTexture("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
                     end
-                    -- Hide rarity border, show default border
+                    -- Show common rarity border for empty slots
                     if rarityBorder then
-                        rarityBorder:Hide()
+                        if rarityBorder.SetAtlas then
+                            rarityBorder:SetAtlas("wowlabs-in-world-item-common", true)
+                            rarityBorder:Show()
+                        end
                     end
+                    -- Hide default border when rarity border is shown
                     if border then
-                        border:Show()
+                        border:Hide()
                     end
                     -- Hide indicators
                     if gemIndicator then
@@ -189,7 +218,45 @@ function CharacterWindow_UpdateEquipmentSlots()
                         border:Hide()
                     end
 
-                    -- Check for enchant first (shown leftmost)
+                    -- Check for gems first (needed for positioning order)
+                    local hasGem = false
+                    if itemLink then
+                        -- Use C_Item.GetItemGems API (most reliable method)
+                        if C_Item and C_Item.GetItemGems then
+                            local gems = C_Item.GetItemGems(itemLink)
+                            if gems and type(gems) == "table" and #gems > 0 then
+                                for _, gem in ipairs(gems) do
+                                    -- Gems can be item IDs (numbers) or item links (strings)
+                                    -- Only count as gem if it's a valid, non-zero value
+                                    if gem ~= nil and gem ~= 0 then
+                                        if type(gem) == "number" then
+                                            -- Valid gem item IDs must be > 0
+                                            if gem > 0 then
+                                                hasGem = true
+                                                break
+                                            end
+                                        elseif type(gem) == "string" then
+                                            -- Check if it's a valid item link or item ID string
+                                            if gem ~= "" and gem ~= "0" then
+                                                -- Try to parse as number first
+                                                local gemId = tonumber(gem)
+                                                if gemId and gemId > 0 then
+                                                    hasGem = true
+                                                    break
+                                                elseif gem:match("item:%d+") then
+                                                    -- It's an item link, count as gem
+                                                    hasGem = true
+                                                    break
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    -- Check for enchant
                     local hasEnchant = false
                     if itemLink and C_Item and C_Item.GetItemEnchantInfo then
                         local enchantId = C_Item.GetItemEnchantInfo(itemLink)
@@ -207,60 +274,22 @@ function CharacterWindow_UpdateEquipmentSlots()
                     end
 
                     -- Determine indicator positioning:
-                    -- Right side slots and main hand: indicators go left
-                    -- Left side slots and off hand: indicators go right
+                    -- Right side slots and weapon slots (main hand and off hand): indicators go left
+                    -- Left side slots: indicators go right
                     local isRightSideSlot = slot.frameName:find("RightSlot", 1, true) ~= nil
                     local isMainHand = slot.frameName:find("BottomSlotMainHand", 1, true) ~= nil
-                    local indicatorsGoLeft = isRightSideSlot or isMainHand
+                    local isOffHand = slot.frameName:find("BottomSlotOffHand", 1, true) ~= nil
+                    local indicatorsGoLeft = isRightSideSlot or isMainHand or isOffHand
 
-                    -- Show/hide and position enchant indicator
-                    if enchantIndicator then
-                        if hasEnchant then
-                            enchantIndicator:ClearAllPoints()
-                            if indicatorsGoLeft then
-                                -- Right side slots and main hand: position to the LEFT of slot (enchant leftmost)
-                                enchantIndicator:SetPoint("RIGHT", button, "LEFT", -4, 0)
-                            else
-                                -- Left side slots and off hand: position to the RIGHT of slot (enchant rightmost)
-                                enchantIndicator:SetPoint("LEFT", button, "RIGHT", 4, 0)
-                            end
-                            if enchantIndicator.SetAtlas then
-                                enchantIndicator:SetAtlas("bags-icon-questitem", true)
-                            end
-                            enchantIndicator:Show()
-                        else
-                            enchantIndicator:Hide()
-                        end
-                    end
-
-                    -- Check for gems
-                    local hasGem = false
-                    if itemLink and C_Item and C_Item.GetItemGems then
-                        local gems = C_Item.GetItemGems(itemLink)
-                        if gems then
-                            for _, gem in ipairs(gems) do
-                                if gem and gem ~= 0 then
-                                    hasGem = true
-                                    break
-                                end
-                            end
-                        end
-                    end
-
-                    -- Show/hide and position gem indicator
+                    -- Position gem indicator first (for right-side slots, gem goes leftmost)
                     if gemIndicator then
                         if hasGem then
                             gemIndicator:ClearAllPoints()
                             if indicatorsGoLeft then
-                                -- Right side slots and main hand: gem goes to the right of enchant (closer to slot)
-                                if hasEnchant and enchantIndicator then
-                                    gemIndicator:SetPoint("LEFT", enchantIndicator, "RIGHT", 2, 0)
-                                else
-                                    -- Position to the left of slot if no enchant
-                                    gemIndicator:SetPoint("RIGHT", button, "LEFT", -4, 0)
-                                end
+                                -- Right side slots and weapon slots: gem goes leftmost (further from slot)
+                                gemIndicator:SetPoint("RIGHT", button, "LEFT", -35, 0)
                             else
-                                -- Left side slots and off hand: gem goes to the right of enchant (away from slot)
+                                -- Left side slots: gem goes to the right of enchant (away from slot)
                                 if hasEnchant and enchantIndicator then
                                     gemIndicator:SetPoint("LEFT", enchantIndicator, "RIGHT", 2, 0)
                                 else
@@ -269,11 +298,38 @@ function CharacterWindow_UpdateEquipmentSlots()
                                 end
                             end
                             if gemIndicator.SetAtlas then
-                                gemIndicator:SetAtlas("bags-icon-profession-goods", true)
+                                gemIndicator:SetAtlas("bags-icon-profession-goods", false)
+                                gemIndicator:SetSize(30, 30)
                             end
                             gemIndicator:Show()
                         else
                             gemIndicator:Hide()
+                        end
+                    end
+
+                    -- Show/hide and position enchant indicator
+                    if enchantIndicator then
+                        if hasEnchant then
+                            enchantIndicator:ClearAllPoints()
+                            if indicatorsGoLeft then
+                                -- Right side slots and weapon slots: enchant goes to the right of gem (closer to slot)
+                                if hasGem and gemIndicator then
+                                    enchantIndicator:SetPoint("LEFT", gemIndicator, "RIGHT", 2, 0)
+                                else
+                                    -- Position to the left of slot if no gem
+                                    enchantIndicator:SetPoint("RIGHT", button, "LEFT", -15, 0)
+                                end
+                            else
+                                -- Left side slots: position to the RIGHT of slot (enchant rightmost)
+                                enchantIndicator:SetPoint("LEFT", button, "RIGHT", 4, 0)
+                            end
+                            if enchantIndicator.SetAtlas then
+                                enchantIndicator:SetAtlas("bags-icon-questitem", false)
+                                enchantIndicator:SetSize(30, 30)
+                            end
+                            enchantIndicator:Show()
+                        else
+                            enchantIndicator:Hide()
                         end
                     end
                 end
@@ -296,9 +352,18 @@ function CharacterWindow_EquipSlot_OnEnter(self)
     if not self or not self.invSlotId then
         return
     end
-    local unit = self.invUnit or "player"
+
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetInventoryItem(unit, self.invSlotId)
+
+    -- If slot is empty, show slot name; otherwise show item tooltip
+    if self.isEmpty and self.invSlotName then
+        GameTooltip:ClearLines()
+        GameTooltip:SetText(self.invSlotName)
+    else
+        local unit = self.invUnit or "player"
+        GameTooltip:SetInventoryItem(unit, self.invSlotId)
+    end
+
     GameTooltip:Show()
 end
 

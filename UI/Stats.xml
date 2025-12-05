@@ -5,8 +5,8 @@
   <Frame name="CharacterWindowStatsPanel" parent="CharacterWindowFrame" inherits="TooltipBorderedFrameTemplate">
     <Size x="350" y="0"/>
     <Anchors>
-      <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-30" y="-80"/>
-      <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="40"/>
+      <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-30" y="-100"/>
+      <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="70"/>
     </Anchors>
 
     <Layers>
@@ -26,21 +26,21 @@
 
       <Layer level="ARTWORK">
         <!-- Title backgrounds centered within the stats panel -->
-        <Texture name="$parentItemLevelTitleBG" atlas="UI-Character-Info-Title">
+        <Texture name="$parentItemLevelTitleBG" atlas="challenges-timerbg">
           <Size x="300" y="55"/>
           <Anchors>
             <!-- TOP uses the horizontal center of the frame, so this centers the art -->
             <Anchor point="TOP" x="0" y="-16"/>
           </Anchors>
         </Texture>
-        <Texture name="$parentAttributesTitleBG" atlas="UI-Character-Info-Title">
+        <Texture name="$parentAttributesTitleBG" atlas="challenges-timerbg">
           <Size x="300" y="55"/>
           <Anchors>
             <!-- Centered directly under the Item Level title, with increased vertical spacing -->
             <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-65"/>
           </Anchors>
         </Texture>
-        <Texture name="$parentEnhancementsTitleBG" atlas="UI-Character-Info-Title">
+        <Texture name="$parentEnhancementsTitleBG" atlas="challenges-timerbg">
           <Size x="300" y="55"/>
           <Anchors>
             <!-- Centered directly under the Attributes title, with increased vertical gap between sections -->
@@ -459,6 +459,45 @@
       </Frame>
     </Frames>
 
+  </Frame>
+
+  <!-- Three empty slots above the stats panel, centered and touching the top -->
+  <Frame name="CharacterWindowStatsPanelSlots" parent="CharacterWindowFrame">
+    <Layers>
+      <Layer level="ARTWORK">
+        <!-- Slot 1: Class icon (inside the frame) -->
+        <Texture name="$parentSlot1">
+          <Size x="20" y="20"/>
+          <Anchors>
+            <Anchor point="BOTTOM" relativeTo="CharacterWindowStatsPanel" relativePoint="TOP" x="-50" y="2"/>
+          </Anchors>
+        </Texture>
+        <Texture name="$parentSlot2">
+          <Size x="32" y="32"/>
+          <Anchors>
+            <Anchor point="BOTTOM" relativeTo="CharacterWindowStatsPanel" relativePoint="TOP" x="0" y="0"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="1"/>
+        </Texture>
+        <Texture name="$parentSlot3">
+          <Size x="32" y="32"/>
+          <Anchors>
+            <Anchor point="BOTTOM" relativeTo="CharacterWindowStatsPanel" relativePoint="TOP" x="50" y="0"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="1"/>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <!-- Slot 1: Frame background (renders above the icon) -->
+        <Texture name="$parentSlot1Frame">
+          <Size x="25" y="25"/>
+          <Anchors>
+            <Anchor point="BOTTOM" relativeTo="CharacterWindowStatsPanel" relativePoint="TOP" x="-50" y="0"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="1"/>
+        </Texture>
+      </Layer>
+    </Layers>
   </Frame>
 
 </Ui>
