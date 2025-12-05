@@ -182,6 +182,19 @@ function CharacterWindowFrame_UpdateSize()
             if CharacterWindow_ResizeRarityBorders then
                 CharacterWindow_ResizeRarityBorders()
             end
+
+            -- Ensure weapon slots have a higher frame level than the character model so they can receive mouse clicks
+            if CharacterWindowFrameModel then
+                local modelLevel = CharacterWindowFrameModel:GetFrameLevel() or 1
+                local weaponSlotLevel = modelLevel + 10 -- Ensure weapon slots are above the model
+
+                if CharacterWindowFrameBottomSlotMainHand then
+                    CharacterWindowFrameBottomSlotMainHand:SetFrameLevel(weaponSlotLevel)
+                end
+                if CharacterWindowFrameBottomSlotOffHand then
+                    CharacterWindowFrameBottomSlotOffHand:SetFrameLevel(weaponSlotLevel)
+                end
+            end
         end
     end
 end

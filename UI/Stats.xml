@@ -36,15 +36,15 @@
         <Texture name="$parentAttributesTitleBG" atlas="UI-Character-Info-Title">
           <Size x="300" y="55"/>
           <Anchors>
-            <!-- Centered directly under the Item Level title, with even more vertical spacing -->
-            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-47"/>
+            <!-- Centered directly under the Item Level title, with increased vertical spacing -->
+            <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-65"/>
           </Anchors>
         </Texture>
         <Texture name="$parentEnhancementsTitleBG" atlas="UI-Character-Info-Title">
           <Size x="300" y="55"/>
           <Anchors>
-            <!-- Centered directly under the Attributes title, with a larger /vertical gap between sections -->
-            <Anchor point="TOP" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOM" x="0" y="-80"/>
+            <!-- Centered directly under the Attributes title, with increased vertical gap between sections -->
+            <Anchor point="TOP" relativeTo="$parentAttributesTitleBG" relativePoint="BOTTOM" x="0" y="-100"/>
           </Anchors>
         </Texture>
 
@@ -56,7 +56,7 @@
             <!-- Centered under the Item Level ribbon -->
             <Anchor point="TOP" relativeTo="$parentItemLevelTitleBG" relativePoint="BOTTOM" x="0" y="-4"/>
           </Anchors>
-          <Color r="1" g="1" b="1" a="0.3"/>
+          <!-- <Color r="1" g="1" b="1" a="0.3"/> -->
         </Texture>
 
         <!-- Section titles (anchored to their title backgrounds, centered) -->
@@ -107,6 +107,16 @@
           <FontHeight val="20"/>
         </FontString>
 
+        <!-- Bounce background behind Intellect/Primary stat (Line 1) -->
+        <Texture name="$parentAttributesLine1Bounce" atlas="UI-Character-Info-Line-Bounce">
+          <Size x="360" y="26"/>
+          <Anchors>
+            <!-- Positioned behind the first attribute line, anchored to Attributes label -->
+            <Anchor point="TOP" relativeTo="$parentAttributesLabel" relativePoint="BOTTOM" x="0" y="-20"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="0.6"/>
+        </Texture>
+
         <!-- Row 2: stamina -->
         <FontString name="$parentAttributesLine2Label" inherits="GameFontHighlightSmall">
           <Anchors>
@@ -138,6 +148,16 @@
           </Anchors>
           <FontHeight val="20"/>
         </FontString>
+
+        <!-- Bounce background behind Armor (Line 3) -->
+        <Texture name="$parentAttributesLine3Bounce" atlas="UI-Character-Info-Line-Bounce">
+          <Size x="360" y="25"/>
+          <Anchors>
+            <!-- Positioned behind the third attribute line, calculated from Attributes label -->
+            <Anchor point="TOP" relativeTo="$parentAttributesLabel" relativePoint="BOTTOM" x="0" y="-72"/>
+          </Anchors>
+          <Color r="1" g="1" b="1" a="0.6"/>
+        </Texture>
 
         <!-- Enhancement lines (placeholders), also split into label + value pairs -->
         <!-- Row 1: crit -->
