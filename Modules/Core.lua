@@ -121,6 +121,12 @@ SlashCmdList["CHARACTERWINDOW"] = function()
         if CharacterWindowFrame_UpdateSize then
             CharacterWindowFrame_UpdateSize()
         end
+        
+        -- Ensure rarity borders are resized after window is sized
+        if CharacterWindow_ResizeRarityBorders then
+            CharacterWindow_ResizeRarityBorders()
+        end
+        
         CharacterWindowFrame:Show()
         -- Show tabs when window is shown
         if CharacterWindowFrameTab1 then CharacterWindowFrameTab1:Show() end

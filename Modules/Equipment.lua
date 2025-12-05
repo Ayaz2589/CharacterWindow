@@ -96,6 +96,28 @@ local function CharacterWindow_SetSlotDesaturated(self, desaturated)
     end
 end
 
+-- Resize all rarity borders to match their slot sizes
+function CharacterWindow_ResizeRarityBorders()
+    if not EQUIPMENT_SLOTS then
+        return
+    end
+
+    for _, slot in ipairs(EQUIPMENT_SLOTS) do
+        local button = _G[slot.frameName]
+        if button then
+            local rarityBorder = button.RarityBorder or _G[slot.frameName .. "RarityBorder"]
+            if rarityBorder then
+                local slotWidth, slotHeight = button:GetSize()
+                if slotWidth and slotHeight and slotWidth > 0 and slotHeight > 0 then
+                    -- Make border about 20% larger than the slot for better visibility
+                    local borderSize = math.max(slotWidth, slotHeight) * 1.28
+                    rarityBorder:SetSize(borderSize, borderSize)
+                end
+            end
+        end
+    end
+end
+
 function CharacterWindow_UpdateEquipmentSlots()
     for _, slot in ipairs(EQUIPMENT_SLOTS) do
         local button = _G[slot.frameName]
@@ -103,6 +125,8 @@ function CharacterWindow_UpdateEquipmentSlots()
             local icon = button.Icon or _G[slot.frameName .. "Icon"]
             local border = button.Border or _G[slot.frameName .. "Border"]
             local rarityBorder = button.RarityBorder or _G[slot.frameName .. "RarityBorder"]
+            local gemIndicator = button.GemIndicator or _G[slot.frameName .. "GemIndicator"]
+            local enchantIndicator = button.EnchantIndicator or _G[slot.frameName .. "EnchantIndicator"]
 
             if icon then
                 local invSlotId = GetInventorySlotInfo(slot.invToken)
@@ -114,7 +138,7 @@ function CharacterWindow_UpdateEquipmentSlots()
                 -- Always show a full-size icon so empty and filled slots look the same size.
                 -- Use the real item icon when present, otherwise use transmog icon or fall back to generic empty-slot texture.
                 if not texture then
-                    -- Empty slot - show transmog icon or generic empty slot, hide rarity border
+                    -- Empty slot - show transmog icon or generic empty slot, hide rarity border and indicators
                     local transmogAtlas = TRANSMOG_ICONS[slot.invToken]
                     if transmogAtlas and icon.SetAtlas then
                         icon:SetAtlas(transmogAtlas, true)
@@ -127,6 +151,13 @@ function CharacterWindow_UpdateEquipmentSlots()
                     end
                     if border then
                         border:Show()
+                    end
+                    -- Hide indicators
+                    if gemIndicator then
+                        gemIndicator:Hide()
+                    end
+                    if enchantIndicator then
+                        enchantIndicator:Hide()
                     end
                 else
                     -- Item is equipped, use normal texture (clear any atlas that might be set)
@@ -157,11 +188,103 @@ function CharacterWindow_UpdateEquipmentSlots()
                     if border then
                         border:Hide()
                     end
+
+                    -- Check for enchant first (shown leftmost)
+                    local hasEnchant = false
+                    if itemLink and C_Item and C_Item.GetItemEnchantInfo then
+                        local enchantId = C_Item.GetItemEnchantInfo(itemLink)
+                        if enchantId and enchantId > 0 then
+                            hasEnchant = true
+                        end
+                    end
+                    -- Fallback: check item link string for enchant ID
+                    if not hasEnchant and itemLink then
+                        -- Item links contain enchant ID in format: |cff...|Hitem:itemID:enchantID:...|h
+                        local enchantId = itemLink:match("item:%d+:(%d+):")
+                        if enchantId and tonumber(enchantId) and tonumber(enchantId) > 0 then
+                            hasEnchant = true
+                        end
+                    end
+
+                    -- Determine indicator positioning:
+                    -- Right side slots and main hand: indicators go left
+                    -- Left side slots and off hand: indicators go right
+                    local isRightSideSlot = slot.frameName:find("RightSlot", 1, true) ~= nil
+                    local isMainHand = slot.frameName:find("BottomSlotMainHand", 1, true) ~= nil
+                    local indicatorsGoLeft = isRightSideSlot or isMainHand
+
+                    -- Show/hide and position enchant indicator
+                    if enchantIndicator then
+                        if hasEnchant then
+                            enchantIndicator:ClearAllPoints()
+                            if indicatorsGoLeft then
+                                -- Right side slots and main hand: position to the LEFT of slot (enchant leftmost)
+                                enchantIndicator:SetPoint("RIGHT", button, "LEFT", -4, 0)
+                            else
+                                -- Left side slots and off hand: position to the RIGHT of slot (enchant rightmost)
+                                enchantIndicator:SetPoint("LEFT", button, "RIGHT", 4, 0)
+                            end
+                            if enchantIndicator.SetAtlas then
+                                enchantIndicator:SetAtlas("bags-icon-questitem", true)
+                            end
+                            enchantIndicator:Show()
+                        else
+                            enchantIndicator:Hide()
+                        end
+                    end
+
+                    -- Check for gems
+                    local hasGem = false
+                    if itemLink and C_Item and C_Item.GetItemGems then
+                        local gems = C_Item.GetItemGems(itemLink)
+                        if gems then
+                            for _, gem in ipairs(gems) do
+                                if gem and gem ~= 0 then
+                                    hasGem = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+
+                    -- Show/hide and position gem indicator
+                    if gemIndicator then
+                        if hasGem then
+                            gemIndicator:ClearAllPoints()
+                            if indicatorsGoLeft then
+                                -- Right side slots and main hand: gem goes to the right of enchant (closer to slot)
+                                if hasEnchant and enchantIndicator then
+                                    gemIndicator:SetPoint("LEFT", enchantIndicator, "RIGHT", 2, 0)
+                                else
+                                    -- Position to the left of slot if no enchant
+                                    gemIndicator:SetPoint("RIGHT", button, "LEFT", -4, 0)
+                                end
+                            else
+                                -- Left side slots and off hand: gem goes to the right of enchant (away from slot)
+                                if hasEnchant and enchantIndicator then
+                                    gemIndicator:SetPoint("LEFT", enchantIndicator, "RIGHT", 2, 0)
+                                else
+                                    -- Position to the right of slot if no enchant
+                                    gemIndicator:SetPoint("LEFT", button, "RIGHT", 4, 0)
+                                end
+                            end
+                            if gemIndicator.SetAtlas then
+                                gemIndicator:SetAtlas("bags-icon-profession-goods", true)
+                            end
+                            gemIndicator:Show()
+                        else
+                            gemIndicator:Hide()
+                        end
+                    end
                 end
                 icon:Show()
             end
         end
     end
+
+    -- Resize all rarity borders to match slot sizes
+    CharacterWindow_ResizeRarityBorders()
+
     -- Ensure the player model reflects any newly equipped/unequipped items
     if CharacterWindow_RefreshModel then
         CharacterWindow_RefreshModel()

@@ -117,14 +117,24 @@ function CharacterWindowFrame_UpdateSize()
             local padding       = (modelH - visibleH) / 2
             local count         = 8
             local leftSlotSize  = math.floor((visibleH - gap * (count - 1)) / count)
-            leftSlotSize        = math.max(32, math.min(leftSlotSize, 72))
+            -- Increase max size for large screens - allow slots to scale up to 96px
+            leftSlotSize        = math.max(32, math.min(leftSlotSize, 96))
             local rightSlotSize = leftSlotSize
 
             -- Apply sizes to all slots
             for _, slot in ipairs(EQUIPMENT_SLOTS) do
                 local button = _G[slot.frameName]
                 if button then
-                    local size = slot.frameName:find("LeftSlot", 1, true) and leftSlotSize or rightSlotSize
+                    -- Determine slot size based on slot type
+                    local size
+                    if slot.frameName:find("LeftSlot", 1, true) then
+                        size = leftSlotSize
+                    elseif slot.frameName:find("BottomSlot", 1, true) then
+                        -- Bottom weapon slots use the same size as side slots
+                        size = leftSlotSize
+                    else
+                        size = rightSlotSize
+                    end
                     button:SetSize(size, size)
                 end
             end
@@ -160,6 +170,17 @@ function CharacterWindowFrame_UpdateSize()
             end
             if RIGHT_SLOT_SUFFIXES then
                 positionColumn(RIGHT_SLOT_SUFFIXES, "RIGHT")
+            end
+
+            -- Update equipment slots to refresh icons and borders
+            -- This will also resize rarity borders via CharacterWindow_ResizeRarityBorders()
+            if CharacterWindow_UpdateEquipmentSlots then
+                CharacterWindow_UpdateEquipmentSlots()
+            end
+
+            -- Explicitly resize rarity borders after slots are updated to ensure they match slot sizes
+            if CharacterWindow_ResizeRarityBorders then
+                CharacterWindow_ResizeRarityBorders()
             end
         end
     end
