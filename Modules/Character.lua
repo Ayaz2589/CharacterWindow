@@ -84,7 +84,7 @@ function CharacterWindowFrame_UpdateSize()
     end
 
     -- Calculate percentage-based size
-    local frameW = screenW * 0.65 -- 65% width
+    local frameW = screenW * 0.40 -- 40% width
     local frameH = screenH * 0.75 -- 75% height (increased for smaller screens)
 
     -- Maximum size constraints (to prevent window from being too large on ultra-wide monitors)
